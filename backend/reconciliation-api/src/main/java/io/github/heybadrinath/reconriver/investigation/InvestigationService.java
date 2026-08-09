@@ -230,7 +230,7 @@ public class InvestigationService {
     private void appendAudit(
             UUID workspaceId, UUID resultId, String event, String note, Instant now) {
         jdbc.sql(
-                        "INSERT INTO audit_event (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at) VALUES (:id,:workspace,'RECONCILIATION_RESULT',:result,:event,'DEMO_OPERATOR',CAST(:details AS jsonb),:now)")
+                        "INSERT INTO audit_event (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at) VALUES (:id,:workspace,'RECONCILIATION_RESULT',:result,:event,'WORKSPACE_OPERATOR',CAST(:details AS jsonb),:now)")
                 .param("id", UUID.randomUUID())
                 .param("workspace", workspaceId)
                 .param("result", resultId)

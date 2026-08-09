@@ -585,7 +585,7 @@ public class ImportService {
 
     private void audit(UUID workspaceId, UUID aggregateId, String event, Map<String, ?> details) {
         jdbc.sql(
-                        "INSERT INTO audit_event (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at) VALUES (:id,:workspace,'IMPORT',:aggregate,:event,'DEMO_OPERATOR',CAST(:details AS jsonb),:now)")
+                        "INSERT INTO audit_event (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at) VALUES (:id,:workspace,'IMPORT',:aggregate,:event,'WORKSPACE_OPERATOR',CAST(:details AS jsonb),:now)")
                 .param("id", UUID.randomUUID())
                 .param("workspace", workspaceId)
                 .param("aggregate", aggregateId)

@@ -885,7 +885,8 @@ class ApplicationIntegrationTest {
                         HttpStatus.OK);
         assertThat(detail.path("resolutions")).hasSize(2);
         assertThat(detail.path("auditEvents").toString())
-                .contains("EXCEPTION_RESOLVED", "EXCEPTION_REOPENED");
+                .contains("EXCEPTION_RESOLVED", "EXCEPTION_REOPENED", "WORKSPACE_OPERATOR")
+                .doesNotContain("DEMO_OPERATOR");
 
         JsonNode audit =
                 request(

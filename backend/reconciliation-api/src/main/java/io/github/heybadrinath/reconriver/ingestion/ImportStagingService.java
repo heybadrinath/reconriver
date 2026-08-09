@@ -179,7 +179,7 @@ class ImportStagingService {
                 INSERT INTO audit_event
                     (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at)
                 VALUES
-                    (:id,:workspace,'IMPORT',:aggregate,'IMPORT_QUEUED','DEMO_OPERATOR',CAST(:details AS jsonb),:now)
+                    (:id,:workspace,'IMPORT',:aggregate,'IMPORT_QUEUED','WORKSPACE_OPERATOR',CAST(:details AS jsonb),:now)
                 """)
                 .param("id", UUID.randomUUID())
                 .param("workspace", workspaceId)
@@ -255,7 +255,7 @@ class ImportStagingService {
                 INSERT INTO audit_event
                     (id,workspace_id,aggregate_type,aggregate_id,event_type,actor_type,details,occurred_at)
                 VALUES
-                    (:id,:workspace,'IMPORT',:aggregate,'IMPORT_DUPLICATE_SKIPPED','DEMO_OPERATOR',
+                    (:id,:workspace,'IMPORT',:aggregate,'IMPORT_DUPLICATE_SKIPPED','WORKSPACE_OPERATOR',
                      CAST(:details AS jsonb),:now)
                 """)
                 .param("id", UUID.randomUUID())
