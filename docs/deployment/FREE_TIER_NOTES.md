@@ -4,7 +4,7 @@ Provider limits below were checked on 2026-08-09 against the linked official doc
 
 ## Vercel Hobby
 
-The [live Next.js frontend](https://reconriver.vercel.app) uses [Vercel Hobby](https://vercel.com/docs/plans/hobby) and calls the Java API directly to avoid unnecessary function usage. Hobby permits personal, non-commercial use; if the project's purpose becomes commercial, re-evaluate the plan before continuing. Production backend configuration permits exactly `https://reconriver.vercel.app` as the browser origin.
+The [live Next.js frontend](https://reconriver.vercel.app) uses [Vercel Hobby](https://vercel.com/docs/plans/hobby) and calls the Java API directly to avoid unnecessary function usage. The current plan is governed by non-commercial-use terms and must be re-evaluated before any commercial use. The deployed backend permits exactly `https://reconriver.vercel.app` as the browser origin.
 
 ## Render Free Web Service
 
@@ -20,7 +20,7 @@ A separate cold-start check began after 20m19.9s without public API activity. Th
 
 ## Neon Free
 
-[Neon Free](https://neon.com/pricing) currently needs no card and has no time limit. Each project includes 100 compute-unit hours per month, 0.5 GB storage, and 5 GB public egress; [scale to zero](https://neon.com/docs/introduction/scale-to-zero) occurs after five idle minutes. Production uses a verified direct Neon PostgreSQL endpoint over SSL (`sslmode=require`), not the [`-pooler` transaction endpoint](https://neon.com/docs/connect/connection-pooling), so Flyway and Spring Batch retain normal session behavior. The API limits Hikari to three connections with no minimum idle connections, and 24-hour workspaces keep demo retention short. Credentials remain only in Render.
+[Neon Free](https://neon.com/pricing) currently needs no card and has no time limit. Each project includes 100 compute-unit hours per month, 0.5 GB storage, and 5 GB public egress; [scale to zero](https://neon.com/docs/introduction/scale-to-zero) occurs after five idle minutes. The deployed API uses a verified direct Neon PostgreSQL endpoint over SSL (`sslmode=require`), not the [`-pooler` transaction endpoint](https://neon.com/docs/connect/connection-pooling), so Flyway and Spring Batch retain normal session behavior. The API limits Hikari to three connections with no minimum idle connections, and 24-hour workspaces keep data retention short. Credentials remain only in Render.
 
 ## Hugging Face public dataset
 

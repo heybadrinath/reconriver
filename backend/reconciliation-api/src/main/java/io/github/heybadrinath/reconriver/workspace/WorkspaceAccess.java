@@ -16,7 +16,7 @@ public final class WorkspaceAccess {
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "SESSION_REQUIRED",
-                    "Start a demo workspace before continuing.");
+                    "Start a workspace before continuing.");
         }
         return principal.workspaceId();
     }

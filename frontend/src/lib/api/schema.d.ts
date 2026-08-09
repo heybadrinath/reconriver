@@ -95,7 +95,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Start an isolated 24-hour demonstration workspace */
+        /** Start an isolated 24-hour workspace */
         post: operations["create_1"];
         delete?: never;
         options?: never;
@@ -178,7 +178,7 @@ export interface paths {
         put?: never;
         /**
          * Validate, stage and start a restartable CSV import
-         * @description Use synthetic demonstration data only. Do not upload real payment, customer, card or bank information.
+         * @description Use synthetic data only. Do not upload real payment, customer, card or bank information.
          */
         post: operations["upload"];
         delete?: never;

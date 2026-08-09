@@ -22,7 +22,7 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
             size={32}
             aria-hidden="true"
           />
-          <span className="sr-only">Checking demo workspace</span>
+          <span className="sr-only">Checking workspace</span>
         </div>
       </AppShell>
     );
@@ -33,7 +33,7 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
       <AppShell>
         <EmptyState
           title="No active workspace"
-          description="Start an isolated 24-hour demo workspace before importing synthetic payment data or running reconciliation."
+          description="Start an isolated 24-hour workspace before importing synthetic payment data or running reconciliation."
           action={
             <Button
               onClick={() =>

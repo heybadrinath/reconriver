@@ -124,6 +124,21 @@ describe("ReconciliationRiver", () => {
     });
   });
 
+  it("renders incomplete source rows without crashing on a missing currency", () => {
+    const incompleteResult: ResultView = {
+      ...results[1]!,
+      id: "result-missing-currency",
+      workKey: "ORDER:MISSING-CURRENCY",
+      currency: null,
+    };
+
+    render(<ReconciliationRiver results={[incompleteResult]} />);
+
+    expect(
+      screen.getAllByRole("button", { name: /currency unavailable/i }),
+    ).not.toHaveLength(0);
+  });
+
   it("has no automatically detectable accessibility violations", async () => {
     const { container } = render(<ReconciliationRiver results={results} />);
     const report = await axe.run(container, {

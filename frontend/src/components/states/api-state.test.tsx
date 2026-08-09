@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { ApiErrorState } from "./api-state";
+import { ApiErrorState, ColdStartState } from "./api-state";
 import { ApiError } from "@/lib/api/client";
 
 describe("ApiErrorState", () => {
@@ -9,7 +9,7 @@ describe("ApiErrorState", () => {
     render(
       <ApiErrorState error={new ApiError(401, { title: "Unauthorized" })} />,
     );
-    expect(screen.getByText("Demo session expired")).toBeInTheDocument();
+    expect(screen.getByText("Workspace expired")).toBeInTheDocument();
     expect(
       screen.getByText("Start a new workspace to continue."),
     ).toBeInTheDocument();
@@ -21,9 +21,18 @@ describe("ApiErrorState", () => {
         error={new ApiError(429, { title: "Too many requests" })}
       />,
     );
-    expect(screen.getByText("Demo limit reached")).toBeInTheDocument();
+    expect(screen.getByText("Request limit reached")).toBeInTheDocument();
     expect(
       screen.getByText(/sending requests too quickly/i),
     ).toBeInTheDocument();
+  });
+
+  it("explains a delayed service start without deployment-plan language", () => {
+    render(<ColdStartState />);
+
+    expect(screen.getByText("The service is starting.")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "This can take several minutes after a period of inactivity.",
+    );
   });
 });

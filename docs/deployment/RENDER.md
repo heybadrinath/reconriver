@@ -47,7 +47,7 @@ STARTUP_TIMEOUT_SECONDS=360 \
   https://reconriver.vercel.app
 ```
 
-That script verifies readiness, OpenAPI, `/docs`, committed contract drift, exact trusted CORS, rejected-origin HTTP 403, health/info-only Actuator exposure, and hidden metrics/Modulith endpoints. The full browser smoke test must then create a demo session, import a stored scenario, run the real Spring Batch reconciliation, resolve and reopen an exception, inspect the audit timeline, and download the report.
+That script verifies readiness, OpenAPI, `/docs`, committed contract drift, exact trusted CORS, rejected-origin HTTP 403, health/info-only Actuator exposure, and hidden metrics/Modulith endpoints. The full browser smoke test must then create a workspace, import a stored scenario, run the Spring Batch reconciliation, resolve and reopen an exception, inspect the audit timeline, and download the report.
 
 ## Recorded public-service evidence
 
@@ -70,7 +70,7 @@ After the rolling replacement, the same live workspace still contained 1,244 res
 
 For the genuine idle-wake check, the UI exposed its `role="status"` wake message and disabled both start actions by +5.3 seconds. Render began the container at +5.057 seconds, logged Spring starting at +25.802 seconds, started Tomcat at +226.099 seconds, and reported the application started in 211.098 seconds at +226.501 seconds from the click. The DispatcherServlet initialized at +232.499 seconds. The UI still showed the wake state at +243.085 seconds and was on `/scenarios` with a real workspace by +266.512 seconds. The 266.5-second figure is therefore an observed end-to-end upper bound, not an exact response time.
 
-Do not infer requests per second, steady-state capacity, availability, future cold-start time, or production-scale performance from these demonstration runs.
+Do not infer requests per second, steady-state capacity, availability, or future cold-start time from these recorded service checks.
 
 ## Free-tier constraints
 

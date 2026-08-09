@@ -365,7 +365,7 @@ class ImportStagingService {
                     throw new ApiException(
                             HttpStatus.PAYLOAD_TOO_LARGE,
                             "ROW_LIMIT_EXCEEDED",
-                            "Public demo imports are limited to 25,000 data rows.");
+                            "Workspace imports are limited to 25,000 data rows.");
                 }
                 if (record.size() > properties.imports().maxColumns()) {
                     throw new ApiException(

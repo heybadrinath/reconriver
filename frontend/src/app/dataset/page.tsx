@@ -22,6 +22,13 @@ import { formatCount } from "@/lib/utils";
 const datasetUrl =
   process.env.NEXT_PUBLIC_DATASET_URL ?? "https://huggingface.co/datasets";
 
+const scenarioTones = [
+  "bg-[var(--green)]",
+  "bg-[var(--coral)]",
+  "bg-[var(--yellow)]",
+  "bg-[var(--violet)]",
+];
+
 const definitions = [
   ["Duplicate input", "A source identifier or complete file is repeated."],
   [
@@ -65,7 +72,8 @@ export default function DatasetPage() {
       />
 
       <div className="data-grid mb-3">
-        <Card className="col-span-12 bg-[var(--yellow-soft)] lg:col-span-7">
+        <Card className="col-span-12 overflow-hidden lg:col-span-7">
+          <div className="h-1.5 bg-[var(--yellow)]" aria-hidden="true" />
           <CardContent className="flex min-h-80 flex-col justify-between">
             <ShieldCheck size={34} aria-hidden="true" />
             <div className="mt-14">
@@ -132,8 +140,12 @@ export default function DatasetPage() {
               {(scenarios.data?.items ?? []).map((scenario, index) => (
                 <div
                   key={scenario.slug}
-                  className={`rounded-2xl border border-[var(--border)] p-5 ${["bg-[var(--green-soft)]", "bg-[var(--coral-soft)]", "bg-[var(--yellow-soft)]", "bg-[var(--violet-soft)]"][index % 4] ?? ""}`}
+                  className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5"
                 >
+                  <span
+                    className={`absolute inset-x-0 top-0 h-1.5 ${scenarioTones[index % scenarioTones.length]}`}
+                    aria-hidden="true"
+                  />
                   <p className="utility-label text-[var(--muted)]">
                     {scenario.slug}
                   </p>
@@ -189,7 +201,7 @@ export default function DatasetPage() {
           </CardContent>
         </Card>
         <div className="grid gap-3">
-          <Card className="bg-[var(--violet-soft)]">
+          <Card className="overflow-hidden border-t-4 border-t-[var(--violet)]">
             <CardContent>
               <Database size={26} aria-hidden="true" />
               <h2 className="mt-8 font-display text-4xl font-bold uppercase">
@@ -215,16 +227,17 @@ export default function DatasetPage() {
               </ol>
             </CardContent>
           </Card>
-          <Card className="bg-[var(--coral-soft)]">
+          <Card className="overflow-hidden border-t-4 border-t-[var(--coral)]">
             <CardContent>
               <h2 className="font-display text-3xl font-bold uppercase">
                 Limits, stated plainly
               </h2>
               <p className="mt-3 text-sm leading-6 text-[var(--muted-strong)]">
                 Synthetic distributions cannot reproduce every processor quirk,
-                regional banking calendar or production data-quality failure.
-                They demonstrate reconciliation behavior; they do not claim
-                real-world throughput or financial accuracy.
+                regional banking calendar or provider-specific data-quality
+                pattern. They support repeatable reconciliation testing; they
+                are not estimates of real-world throughput or financial
+                outcomes.
               </p>
             </CardContent>
           </Card>

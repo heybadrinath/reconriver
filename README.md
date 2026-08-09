@@ -1,122 +1,76 @@
 # ReconRiver
 
-**Explainable payment reconciliation and settlement operations, built as a Java-first portfolio system.**
+**Explainable payment reconciliation and settlement operations.**
 
-[Live workbench](https://reconriver.vercel.app) · [API documentation](https://reconriver-api.onrender.com/docs) · [Synthetic datasets](https://huggingface.co/datasets/heybadrinath/reconriver-synthetic-reconciliation) · [Source](https://github.com/heybadrinath/reconriver) · [Portfolio](https://ram-badrinath.vercel.app/)
+[Live workbench](https://reconriver.vercel.app) · [API documentation](https://reconriver-api.onrender.com/docs) · [Synthetic datasets](https://huggingface.co/datasets/heybadrinath/reconriver-synthetic-reconciliation)
 
-ReconRiver turns synthetic internal-ledger, processor, and bank-settlement exports into deterministic reconciliation results. An operator can follow each result from source records to a named rule, investigate exceptions, resolve or reopen them, inspect the append-only audit history, and export a CSV report.
+ReconRiver reconciles internal-ledger, payment-processor, and bank-settlement records through deterministic rules. Operations teams can trace every result to its source records and rule, investigate exceptions, record resolutions, review audit history, and export reconciliation reports.
 
-> The public site is a personal, non-commercial demonstration. Use synthetic data only. It is not production financial infrastructure, and its free backend can take time to wake after being idle.
+![ReconRiver workbench](docs/assets/reconriver-live-workbench.jpg)
 
-![Live ReconRiver desktop overview](docs/assets/reconriver-live-desktop.jpg)
+## Capabilities
 
-## 60-second demo
+- Import internal, processor, and bank CSVs with validation, row quarantine, checksums, and duplicate-file detection.
+- Run restartable, chunk-based reconciliation jobs backed by the Spring Batch job repository.
+- Match ledger entries to processor activity, then processor settlement batches to bank credits.
+- Preserve rule codes, explanations, monetary differences, and source identifiers with every result.
+- Investigate, resolve, and reopen exceptions with append-only audit history.
+- Inspect transaction traces, reconciliation summaries, job progress, and downloadable CSV reports.
+- Load four deterministic scenario packs with committed ground truth for repeatable verification.
 
-Start an anonymous workspace, load **Mixed exceptions**, and let the API import its synthetic ledger, processor, and bank files. Run reconciliation and use the River to open one exception, compare its source records and named rule, resolve it with a note, then reopen it and inspect the append-only audit history. Finish by exporting the CSV report and opening the Architecture page to connect the visible workflow to Spring Batch restartability, deterministic money rules, PostgreSQL constraints, and the modular-monolith boundaries.
-
-## Product flow
-
-1. Start an anonymous 24-hour workspace. The raw bearer token is returned once; only its keyed hash is stored.
-2. Load one of four deterministic scenario packs or upload three synthetic CSV files.
-3. Spring Batch stages, validates, normalizes, and imports the rows into PostgreSQL. Invalid rows are quarantined with reasons.
-4. A restartable reconciliation job applies ordered ledger-to-processor rules, then processor-batch-to-bank rules.
-5. The Next.js workbench shows API-owned progress and outcomes through summaries, the Reconciliation River, result tables, transaction traces, and exception actions.
-6. Resolve or reopen an exception, inspect the audit timeline, and download the run report.
-
-![Live ReconRiver run workbench](docs/assets/reconriver-live-workbench.jpg)
-
-![Live ReconRiver mobile River](docs/assets/reconriver-live-mobile-river.jpg)
+Public workspaces expire after 24 hours. Upload only synthetic data; the public service is not configured to handle personal, customer, or live financial records.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    Browser["Next.js 16 workbench<br/>Vercel Hobby"] -->|"Bearer token + JSON/CSV"| API["Java 21 / Spring Boot 4 API<br/>Render Free"]
-    API --> Workspace["Workspace and session"]
-    API --> Ingestion["CSV staging and imports"]
-    Ingestion --> Batch["Spring Batch jobs"]
-    Batch --> Rules["Deterministic reconciliation"]
-    Rules --> Investigation["Exception workflow"]
-    Rules --> Reporting["Traces and CSV reports"]
-    Investigation --> Audit["Append-only audit history"]
-    Workspace --> Postgres[("Neon PostgreSQL")]
-    Ingestion --> Postgres
-    Batch --> Postgres
-    Rules --> Postgres
-    Audit --> Postgres
-    Generator["Java dataset generator"] --> Packs["Deterministic scenario packs"]
-    Packs --> API
-    Packs --> Dataset["Hugging Face<br/>public synthetic datasets"]
+    Web["Next.js workbench"] -->|"Bearer token + JSON/CSV"| API["Spring Boot API"]
+    API --> Import["Validated ingestion"]
+    Import --> Batch["Spring Batch"]
+    Batch --> Rules["Deterministic matching rules"]
+    Rules --> Cases["Exception workflow"]
+    Rules --> Reports["Traces and reports"]
+    Cases --> Audit["Append-only audit history"]
+    API --> DB[("PostgreSQL")]
+    Import --> DB
+    Batch --> DB
+    Rules --> DB
+    Audit --> DB
 ```
 
-The backend is a Spring Modulith modular monolith, not a collection of pretend microservices. Imports, reconciliation output, resolutions, and audit events benefit from local transactions, while tested package boundaries keep future extraction possible. PostgreSQL is the durable system of record; Render's local filesystem is not used for durable data. Stored scenarios are bundled from the same committed artifacts published to Hugging Face, so the public dataset is verifiable evidence rather than a runtime network dependency.
+The backend is a Java 21 modular monolith built with Spring Boot, Spring Modulith, Spring Batch, Flyway, and PostgreSQL. It owns validation, matching, monetary policy, job state, exception transitions, and reporting. The Next.js application presents API-owned state and does not recalculate financial outcomes in the browser.
 
-### Why these choices
+Key design decisions:
 
-- `BigDecimal`, declared rounding, and PostgreSQL `NUMERIC(19,4)` keep money comparisons deterministic.
-- Spring Batch provides chunk transactions, a durable job repository, progress metadata, and restart semantics.
-- Flyway V1–V9 and database constraints protect canonical imports, one active run per workspace, stable work identities, results, and append-only audit rows.
-- The bounded two-worker application executor applies backpressure instead of creating an unbounded number of asynchronous tasks.
-- The frontend renders API results and never recalculates financial match status.
+- Monetary values use `BigDecimal` and PostgreSQL `NUMERIC(19,4)` with explicit rounding rules.
+- Ordered reconciliation rules always produce a stable rule code and human-readable explanation.
+- PostgreSQL constraints protect import identity, active runs, work items, results, and immutable audit records.
+- A bounded two-worker executor applies backpressure to asynchronous imports and reconciliation runs.
+- Row locking serializes concurrent exception resolution and reopen operations.
 
-## Verified live evidence
+See the [architecture overview](docs/architecture/OVERVIEW.md) and [architecture decisions](docs/decisions/).
 
-The following measurements were observed against the public Render API and Neon database on 2026-08-09. They are demonstration measurements on a constrained free instance, not throughput claims for a production payment system.
+## Repository layout
 
-| Journey                                                    | Total results | Matched | Exceptions | Observed elapsed time |
-| ---------------------------------------------------------- | ------------: | ------: | ---------: | --------------------: |
-| Mixed exceptions                                           |         1,244 |   1,007 |        237 |                19.9 s |
-| Month-end close, 10,000 canonical payments                 |        11,539 |  11,239 |        300 |          Not recorded |
-| Controlled failure and recovery, 10,000 canonical payments |        11,369 |  10,813 |        556 |              264.65 s |
+| Path                         | Purpose                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `backend/reconciliation-api` | Spring Boot API, reconciliation engine, jobs, persistence, and migrations |
+| `backend/dataset-generator`  | Deterministic Java scenario generator                                     |
+| `frontend`                   | Next.js operator workbench                                                |
+| `datasets`                   | Generated scenario packs, schemas, checksums, and dataset card            |
+| `scripts`                    | Runtime, contract, and dataset verification utilities                     |
+| `docs`                       | Architecture decisions and deployment runbooks                            |
 
-Result totals include both order-level and settlement-level work, so they can exceed the number of canonical payments.
+## Quick start
 
-The first Render deployment reached application readiness in 207 seconds. That is an initial deployment-startup observation; it is not presented as a measured wake time from Render's idle state.
+Requirements:
 
-Additional live operations evidence:
+- Java 21
+- Docker with Compose
+- Node.js 24
+- pnpm 11.20
 
-| Check                          | Observation                                                                                                                                                               |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Maximum public import boundary | A 25,000-row synthetic internal-ledger CSV imported 25,000/25,000 rows with 0 quarantined in 260 s                                                                        |
-| Rolling service replacement    | The replacement started Spring in 210.494 s; the existing service remained available, and the same workspace retained 1,244 results plus its resolve/reopen audit entries |
-| Genuine idle wake              | After 20m19.9s without public API activity, the UI showed its wake state and reached a real workspace by 266.5 s (4m26.5s) after the first user action                    |
-| Final deployed mobile journey  | Run `200291e1-8569-472d-ad2a-f1a5204da843` completed with 1,244 results: 1,007 matched and 237 exceptions in 42.4 s                                                       |
-
-No public downtime was observed during that rolling replacement. This is persistence and rollout evidence from one event, not a high-availability claim or a measurement of an idle-service cold start.
-
-For the separate idle-wake check, the UI exposed a live `role="status"` message—**The backend is waking up. This can take several minutes...**—and disabled both start actions by +5.3 s. Render started the container at +5.057 s, logged Spring startup at +25.802 s, and reported the application started in 211.098 s (+226.501 s from the click). The browser still showed the wake state at +243.085 s and was on `/scenarios` with a real workspace by +266.512 s. Therefore 266.5 s is an observed upper bound for the end-to-end transition, not an exact response time.
-
-The final deployed 375 × 844 mobile audit measured no horizontal document overflow, all 49 visible application-owned targets at 44 × 44 px or larger, a visible 301 px-wide vertical River, and no desktop River SVG. Axe recorded 29 passes, 0 violations, and 0 incomplete checks; the console recorded 0 warnings or errors; reduced-motion mode left 0 animated elements. Representative focus rings were visible, while natural sequential Tab order is not claimed as manually verified.
-
-The public Hugging Face repository exposes all 16 scenario/file configurations in Dataset Viewer. The downloaded artifacts were checked against all 32 committed SHA-256 entries, and the committed generator reproduces the CSV, JSON, ZIP, and documentation artifacts byte for byte from seed `42` and fixed start date `2026-01-01`.
-
-## Scenario packs
-
-| Scenario           | Canonical payments | Purpose                                                                      |
-| ------------------ | -----------------: | ---------------------------------------------------------------------------- |
-| `clean-settlement` |                100 | Fully matched baseline                                                       |
-| `mixed-exceptions` |              1,000 | Missing, duplicate, currency, amount, fee, refund, and settlement exceptions |
-| `month-end-close`  |             10,000 | Larger deterministic month-end journey                                       |
-| `failure-recovery` |             10,000 | Controlled five-chunk failure followed by a bodyless restart                 |
-
-Each pack includes three source CSVs, exact expected reconciliation output, a manifest, checksums, a downloadable archive, and a scenario README. The data is synthetic and published under CC BY 4.0; the application source is MIT licensed.
-
-## Quality gates
-
-- Maven `verify` on Java 21: 32 tests — 16 API tests, including seven PostgreSQL Testcontainers journeys, plus 16 generator tests — with Spotless formatting and Spring Modulith boundary verification.
-- Frontend: Prettier, ESLint, TypeScript, 35 Vitest unit/accessibility tests across 12 files, and a Next.js production build.
-- Browser journey: two Playwright projects (desktop Chromium and mobile Chromium) against real API results, covering scenario load, imports, reconciliation, resolve, reopen, audit history, CSV export, and axe checks.
-- Final production mobile audit: WCAG 2.0/2.1/2.2 A/AA axe scan, 44 px target sizing, overflow, reduced motion, River layout, representative focus rings, and console output.
-- Contract drift: running Spring OpenAPI versus the committed document, then committed OpenAPI versus generated TypeScript.
-- Packaging: executable JAR and repository-root Docker build, runtime smoke journey under `-Xmx320m`, and non-root container execution as UID `10001`.
-- Data publication: schema validation, row counts, reproducibility, manifest hashes, archives, and all 16 Hugging Face Viewer configurations.
-- CI: Java/JAR, frontend, root-context container, dataset reproducibility, and secret-scanning jobs.
-
-These gates prove the implemented demonstration and its deterministic fixtures. They do not establish regulatory compliance, high availability, or production-scale performance.
-
-## Run locally
-
-Requirements: Java 21, Docker, Node.js 24, and pnpm 11.20.
+Start PostgreSQL and the API:
 
 ```bash
 cp .env.example .env
@@ -126,7 +80,7 @@ cd backend
 ./mvnw spring-boot:run -pl reconciliation-api
 ```
 
-In a second terminal:
+In a second terminal, start the frontend:
 
 ```bash
 cd frontend
@@ -134,50 +88,105 @@ pnpm install --frozen-lockfile
 NEXT_PUBLIC_API_URL=http://localhost:8080 pnpm dev
 ```
 
-Open `http://localhost:3000`. Local defaults are documented in [`.env.example`](.env.example); never commit real database credentials or token secrets.
+Open [http://localhost:3000](http://localhost:3000). Swagger UI is available at [http://localhost:8080/docs](http://localhost:8080/docs).
 
-### Verify the repository
+## Configuration
+
+Local defaults are defined in [`.env.example`](.env.example). The main runtime variables are:
+
+| Variable                      | Purpose                                   | Local default                                 |
+| ----------------------------- | ----------------------------------------- | --------------------------------------------- |
+| `DB_URL`                      | PostgreSQL JDBC URL                       | `jdbc:postgresql://localhost:5432/reconriver` |
+| `DB_USERNAME` / `DB_PASSWORD` | Database credentials                      | Local Compose credentials                     |
+| `DEMO_TOKEN_HASH_SECRET`      | HMAC secret used to hash workspace tokens | Local-only development value                  |
+| `ALLOWED_ORIGINS`             | Exact browser origins accepted by CORS    | `http://localhost:3000`                       |
+| `MAX_UPLOAD_BYTES`            | Per-file upload limit                     | `10485760`                                    |
+| `MAX_IMPORT_ROWS`             | Maximum data rows per uploaded CSV        | `25000`                                       |
+| `BATCH_CHUNK_SIZE`            | Spring Batch chunk size                   | `500`                                         |
+| `DB_POOL_SIZE`                | Hikari maximum pool size                  | `3`                                           |
+| `NEXT_PUBLIC_API_URL`         | API origin used by the frontend           | `http://localhost:8080`                       |
+
+The `production` Spring profile rejects missing database credentials, local credential defaults, an unsafe token-hash secret, or an invalid CORS configuration. Never commit secrets or a concrete database endpoint.
+
+## API and datasets
+
+- OpenAPI document: [`frontend/openapi/openapi.json`](frontend/openapi/openapi.json)
+- Generated frontend types: [`frontend/src/lib/api/schema.d.ts`](frontend/src/lib/api/schema.d.ts)
+- Live Swagger UI: [reconriver-api.onrender.com/docs](https://reconriver-api.onrender.com/docs)
+- Dataset card and generation guide: [`datasets/README.md`](datasets/README.md)
+- Published dataset: [ReconRiver synthetic reconciliation scenarios](https://huggingface.co/datasets/heybadrinath/reconriver-synthetic-reconciliation)
+
+The repository includes clean-settlement, mixed-exceptions, month-end-close, and failure-recovery packs. Each pack contains three source CSVs, exact expected results, a manifest, checksums, and a reproducible archive. Generated data is licensed under CC BY 4.0.
+
+## Verification
+
+Run the backend suite with Java 21:
 
 ```bash
-cd backend && ./mvnw verify
-cd ../frontend && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm api:check && pnpm build
-cd .. && docker build --file backend/reconciliation-api/Dockerfile --tag reconriver-api .
+cd backend
+./mvnw verify
 ```
 
-Dataset reproducibility additionally requires `check-jsonschema`:
+Run frontend quality and contract checks with Node.js 24:
+
+```bash
+cd frontend
+pnpm install --frozen-lockfile
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm api:check
+pnpm build
+```
+
+Verify dataset reproducibility and the repository-root container build:
 
 ```bash
 ./scripts/verify-datasets.sh
+docker build --file backend/reconciliation-api/Dockerfile --tag reconriver-api .
 ```
 
-## Public deployment shape and limits
+The integration suite uses PostgreSQL Testcontainers to cover migrations, imports, exact ground-truth comparison, restart without duplicate output, competing runs, workspace isolation, exception transitions, audit history, and database locking. CI also checks OpenAPI drift, executable-JAR startup, non-root container execution, dataset checksums, and committed-secret patterns.
 
-- **Frontend:** Vercel Hobby, for this personal non-commercial portfolio only.
-- **API:** Render Free in Frankfurt, one web process, 512 MB class, 320 MB JVM heap, two bounded batch workers, no keep-alive traffic.
-- **Database:** direct Neon PostgreSQL SSL endpoint, Hikari maximum pool size `3`, `minimumIdle=0`.
-- **Dataset:** public Hugging Face repository containing synthetic artifacts only.
-- **Retention:** workspaces expire after 24 hours and scheduled cleanup deletes their data.
-- **Uploads:** CSV only, 10 MB and 25,000 data rows maximum; formula-like report cells are neutralized.
-- **Availability:** the backend scales down when idle, the Render filesystem is ephemeral, Neon can scale to zero, and monthly free allowances can make the demo temporarily unavailable.
+## Deployment
 
-The live Render service was created through Render's official API using the checked-in `render.yaml` values. It is not Blueprint-linked, and automatic deployment is disabled so a tested commit can be promoted deliberately. Database credentials and the generated token-hash secret exist only in Render.
+The public service uses:
 
-The maximum 25,000-row public import boundary and genuine idle-to-workspace wake are both verified above. Free-service wake time varies; the single observation is not a service-level guarantee.
+- Vercel for the Next.js frontend.
+- Render for the containerized Spring Boot API.
+- Neon PostgreSQL for durable application and Spring Batch state.
+- Hugging Face for the public synthetic dataset.
+
+Deployment configuration and verification procedures are documented in [Render deployment](docs/deployment/RENDER.md) and [free-tier constraints](docs/deployment/FREE_TIER_NOTES.md). The API intentionally uses a direct Neon SSL endpoint with a three-connection application pool; it does not rely on Render's ephemeral filesystem for durable data.
+
+## Security and data policy
+
+- Workspace bearer tokens are high entropy, returned once, and stored only as keyed hashes.
+- Every business query is scoped to a workspace; workspaces and their data expire after 24 hours.
+- Uploads are restricted by media type, filename, byte size, row count, column count, and row width.
+- Exported values that could be interpreted as spreadsheet formulas are neutralized.
+- The deployed API exposes public health and info probes while keeping metrics and module internals unavailable.
+- The public application accepts synthetic CSV data only. Do not upload real payment, banking, customer, or personal information.
+
+Security concerns can be reported privately through the repository owner's GitHub profile. Do not include credentials or sensitive records in an issue.
+
+## Operational constraints
+
+- The public API can take several minutes to resume after idle periods on the current hosting plan.
+- Public imports are limited to 10 MB and 25,000 rows per CSV.
+- Reconciliation rules model a defined set of payment and settlement outcomes; they are not processor-specific accounting policy.
+- Anonymous workspaces do not provide organization membership, roles, approval chains, or regulated retention controls.
+- Multi-region availability, disaster recovery, private object storage, malware scanning, and compliance controls are outside the current deployment scope.
 
 ## Documentation
 
 - [Architecture overview](docs/architecture/OVERVIEW.md)
-- [Design system](docs/architecture/DESIGN_SYSTEM.md)
-- [Interview guide and honest trade-offs](docs/INTERVIEW_GUIDE.md)
-- [Render deployment and verification](docs/deployment/RENDER.md)
+- [Architecture decisions](docs/decisions/)
+- [Render deployment](docs/deployment/RENDER.md)
 - [Free-tier constraints](docs/deployment/FREE_TIER_NOTES.md)
 - [Dataset card](datasets/README.md)
-- [Design QA](design-qa.md)
-
-## Responsible use
-
-ReconRiver deliberately excludes real payment data, real customer data, fuzzy auto-acceptance, claims of financial compliance, and claims of production scale. A real deployment would still need organization identity, least-privilege roles, approval workflows, private object storage and malware scanning, tamper-evident retention, backup and disaster-recovery tests, SLOs, paging, privacy review, and processor-specific rule governance.
 
 ## License
 
-Application source: [MIT](LICENSE). Synthetic datasets: [CC BY 4.0](datasets/README.md#licence).
+Application source is available under the [MIT License](LICENSE). Generated datasets are available under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).

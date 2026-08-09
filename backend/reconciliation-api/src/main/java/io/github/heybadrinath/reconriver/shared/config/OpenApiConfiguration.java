@@ -32,7 +32,7 @@ class OpenApiConfiguration {
                         new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
-                                .bearerFormat("opaque demo session token"))
+                                .bearerFormat("opaque workspace token"))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
     }
 

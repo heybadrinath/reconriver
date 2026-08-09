@@ -9,8 +9,8 @@ Build one Spring Boot deployment with package-by-feature application modules ver
 
 ## Rationale
 
-The product needs consistent monetary writes, restartable batch jobs, and audit events more than independent scaling. A modular monolith keeps those transactions explicit, fits a constrained free instance, and still makes boundaries testable. Kafka and independent services would add failure modes, cost, and operational work without improving the demonstration.
+The product needs consistent monetary writes, restartable batch jobs, and audit events more than independent scaling. A modular monolith keeps those transactions explicit, fits the current runtime envelope, and still makes boundaries testable. Kafka and independent services would add failure modes, cost, and operational work without improving the reconciliation workflow.
 
 ## Consequences
 
-The API and batch worker share one process and database. A future production version could externalize selected Modulith events to a broker after the core transactional model and workload justify it.
+The API and batch worker share one process and database. Selected Modulith events can be externalized to a broker when measured workload or independent consumers justify the added operational boundary.

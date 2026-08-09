@@ -161,7 +161,7 @@ export interface ResultView {
   netAmount: number | string | null;
   bankCredit: number | string | null;
   difference: number | string | null;
-  currency: string;
+  currency: string | null;
   internalOccurredAt: string | null;
   processorEventAt: string | null;
   bankBookedAt: string | null;
@@ -213,7 +213,7 @@ export interface RiverFlow {
   ruleCode: string;
   explanation: string;
   amount: number | string | null;
-  currency: string;
+  currency: string | null;
   internalId: string | null;
   processorId: string | null;
   batchId: string | null;

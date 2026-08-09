@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/demo/sessions")
-@Tag(name = "Demo sessions")
+@Tag(name = "Workspace sessions")
 class DemoSessionController {
     private final DemoSessionService service;
 
@@ -20,7 +20,7 @@ class DemoSessionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Start an isolated 24-hour demonstration workspace")
+    @Operation(summary = "Start an isolated 24-hour workspace")
     DemoSessionService.SessionCreated create() {
         return service.create();
     }

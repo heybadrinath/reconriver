@@ -62,7 +62,7 @@ class SecurityConfig {
                                                                 objectMapper,
                                                                 401,
                                                                 "SESSION_REQUIRED",
-                                                                "Start a demo workspace or replace the expired session token."))
+                                                                "Start a workspace or replace the expired session token."))
                                         .accessDeniedHandler(
                                                 (request, response, exception) ->
                                                         writeProblem(
@@ -70,7 +70,7 @@ class SecurityConfig {
                                                                 objectMapper,
                                                                 403,
                                                                 "ACCESS_DENIED",
-                                                                "This demo session cannot access the requested resource.")))
+                                                                "This workspace session cannot access the requested resource.")))
                 .headers(
                         headers ->
                                 headers.contentTypeOptions(Customizer.withDefaults())

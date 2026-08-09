@@ -15,7 +15,7 @@ pnpm install
 NEXT_PUBLIC_API_URL=http://localhost:8080 pnpm dev
 ```
 
-Open `http://localhost:3000`. The public landing, dataset and architecture routes work without a demo token. Starting a workspace stores the short-lived Bearer token in `sessionStorage`; it is never persisted in a cookie or local storage.
+Open `http://localhost:3000`. The public landing, dataset and architecture routes work without a workspace token. Starting a workspace stores its short-lived Bearer token in `sessionStorage`; it is never persisted in a cookie or `localStorage`.
 
 ## Environment
 
@@ -57,16 +57,16 @@ pnpm api:check:live
 
 ## Routes
 
-- `/` — product landing and conceptual rule preview
+- `/` — product landing and interactive rule preview
 - `/scenarios` — prepared dataset selection and file preview
 - `/overview` — latest completed run metrics and Reconciliation River
 - `/imports` — synthetic CSV intake and import history
-- `/runs`, `/runs/[runId]` — genuine Spring Batch history and progress
+- `/runs`, `/runs/[runId]` — Spring Batch history and progress
 - `/exceptions` — filterable investigation and resolution workbench
 - `/transactions/[transactionId]` — source evidence and audit trace
 - `/dataset` — generator, scenarios, licence and limitations
-- `/architecture` — recruiter-oriented Java system tour
+- `/architecture` — system architecture and runtime boundaries
 
-## Responsible use
+## Data policy
 
-Use synthetic demonstration data only. Do not upload real payment, customer, card or bank information. The public demo is not production financial infrastructure.
+Use synthetic data only. Do not upload real payment, customer, card, bank or personal information.

@@ -62,7 +62,7 @@ public class RateLimitFilter implements Filter {
                             "status",
                             429,
                             "detail",
-                            "This public demo limit has been reached. Try again after the Retry-After interval.",
+                            "The request limit has been reached. Try again after the Retry-After interval.",
                             "code",
                             "RATE_LIMIT_EXCEEDED"));
             return;

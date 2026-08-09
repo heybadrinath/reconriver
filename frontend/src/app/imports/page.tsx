@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { PageIntro } from "@/components/layout/page-intro";
+import { ReconcileProgress } from "@/components/layout/reconcile-progress";
 import { WorkspaceGate } from "@/components/layout/workspace-gate";
 import { ApiErrorState, EmptyState } from "@/components/states/api-state";
 import { StatusBadge } from "@/components/ui/badge";
@@ -44,7 +45,7 @@ export const uploadSchema = z.object({
     .instanceof(File, { message: "Choose a CSV file." })
     .refine(
       (file) => file.size <= 10 * 1024 * 1024,
-      "The public demo accepts files up to 10 MB.",
+      "Files can be up to 10 MB.",
     )
     .refine(
       (file) =>
@@ -251,6 +252,18 @@ function ImportsContent() {
     0,
   );
   const readiness = summarizeImportReadiness(list, loadedImportIds);
+  const currentImports =
+    loadedImportIds.length > 0
+      ? list.filter((item) => loadedImportIds.includes(item.id))
+      : list;
+  const sourceSlots = [
+    { sourceType: "INTERNAL" as const, label: "Internal ledger" },
+    { sourceType: "PROCESSOR" as const, label: "Payment processor" },
+    { sourceType: "BANK" as const, label: "Bank settlement" },
+  ].map((source) => ({
+    ...source,
+    item: currentImports.find((item) => item.sourceType === source.sourceType),
+  }));
   const importColumns = useMemo<ColumnDef<ImportView>[]>(
     () => [
       ...columns,
@@ -282,14 +295,15 @@ function ImportsContent() {
   return (
     <>
       <PageIntro
-        eyebrow="Step 2 · Validate source files"
-        title="Imports"
-        description="Load prepared scenario files or upload synthetic CSV data. The browser performs basic safety checks; the Spring API remains authoritative for headers, rows, checksums and idempotency."
+        eyebrow="Reconcile · Step 2 of 3"
+        title="Review sources"
+        description="Confirm that the ledger, processor and bank files are ready. Quarantined rows remain visible for correction before reconciliation."
         actions={
           readiness.ready ? (
             <Button asChild variant="primary">
               <Link href="/runs">
-                Continue to runs <ArrowRight size={18} aria-hidden="true" />
+                Continue to reconciliation
+                <ArrowRight size={18} aria-hidden="true" />
               </Link>
             </Button>
           ) : (
@@ -312,6 +326,7 @@ function ImportsContent() {
           )
         }
       />
+      <ReconcileProgress current={2} completedThrough={1} />
 
       {loadedFromScenario ? (
         <div
@@ -340,7 +355,7 @@ function ImportsContent() {
             <p className="text-sm text-[var(--muted-strong)]">
               {readiness.ready
                 ? "All three source types reached a successful terminal state. Review the row counts before continuing."
-                : `${readiness.readySourceCount} of 3 source types are ready. This page refreshes from the API until validation finishes.`}
+                : `${readiness.readySourceCount} of 3 source types are ready. Status updates automatically until validation finishes.`}
             </p>
           </div>
         </div>
@@ -362,8 +377,7 @@ function ImportsContent() {
               {readiness.active.length === 1 ? "file" : "files"}
             </p>
             <p className="text-sm text-[var(--muted-strong)]">
-              Status and row progress refresh directly from the API every
-              second.
+              Status and row progress update automatically.
             </p>
           </div>
         </div>
@@ -390,7 +404,7 @@ function ImportsContent() {
                   <li key={item.id}>
                     <span className="font-bold">{item.fileName}:</span>{" "}
                     {item.failureMessage ??
-                      "The API did not return a failure explanation."}
+                      "No failure explanation was returned."}
                   </li>
                 ))}
               </ul>
@@ -398,6 +412,66 @@ function ImportsContent() {
           </div>
         </div>
       ) : null}
+
+      <section
+        className="mb-3 grid gap-3 md:grid-cols-3"
+        aria-labelledby="source-readiness-heading"
+      >
+        <h2 id="source-readiness-heading" className="sr-only">
+          Source readiness
+        </h2>
+        {sourceSlots.map(({ sourceType: slotType, label, item }) => {
+          const progress = item ? importProgress(item) : null;
+          return (
+            <Card key={slotType} className="overflow-hidden">
+              <div
+                className={`h-1.5 ${slotType === "INTERNAL" ? "bg-[var(--yellow)]" : slotType === "PROCESSOR" ? "bg-[var(--violet)]" : "bg-[var(--green)]"}`}
+                aria-hidden="true"
+              />
+              <CardContent className="pt-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="utility-label text-[var(--muted)]">
+                      {slotType}
+                    </p>
+                    <h3 className="mt-1 font-display text-2xl font-bold uppercase">
+                      {label}
+                    </h3>
+                  </div>
+                  {item ? (
+                    <StatusBadge value={item.status} />
+                  ) : (
+                    <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-bold text-[var(--muted)]">
+                      Missing
+                    </span>
+                  )}
+                </div>
+                {item && progress ? (
+                  <div className="mt-5">
+                    <p
+                      className="truncate text-sm font-bold"
+                      title={item.fileName}
+                    >
+                      {item.fileName}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-[var(--muted)]">
+                      <span>
+                        {formatCount(progress.processed)} rows checked
+                      </span>
+                      <span>{Math.round(progress.percent)}%</span>
+                    </div>
+                    <Progress value={progress.percent} className="mt-2" />
+                  </div>
+                ) : (
+                  <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
+                    Choose a scenario or upload this source to continue.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </section>
 
       <div className="data-grid">
         <Card className="col-span-12 lg:col-span-7">
@@ -467,9 +541,9 @@ function ImportsContent() {
                     {selectedFile?.name ?? "Drop a CSV file here"}
                   </p>
                   <p className="mt-1 text-xs text-[var(--muted)]">
-                    CSV only · 10 MB maximum · 25,000 public rows
+                    CSV only · 10 MB maximum · 25,000 rows
                   </p>
-                  <label className="mt-4 inline-flex min-h-10 cursor-pointer items-center rounded-full border border-[var(--border-strong)] bg-white px-4 text-xs font-bold focus-within:ring-3 focus-within:ring-[var(--focus)]">
+                  <label className="mt-4 inline-flex min-h-11 cursor-pointer items-center rounded-full border border-[var(--border-strong)] bg-white px-4 text-xs font-bold focus-within:ring-3 focus-within:ring-[var(--focus)]">
                     Browse files
                     <input
                       ref={inputRef}
@@ -508,8 +582,8 @@ function ImportsContent() {
                     ))}
                   </div>
                   <p className="mt-3 text-xs text-[var(--muted)]">
-                    The API will validate required columns and report exact
-                    errors.
+                    Required columns and row values are validated before the
+                    file is accepted.
                   </p>
                 </div>
               ) : null}
@@ -521,8 +595,8 @@ function ImportsContent() {
                   aria-hidden="true"
                 />
                 <p className="flex-1 text-xs leading-5">
-                  Use synthetic demonstration data only. Do not upload real
-                  payment, customer, card or bank information.
+                  Synthetic data only. Do not upload payment, banking, customer
+                  or personal information.
                 </p>
                 <Button
                   type="submit"

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class ScenarioService {
     private static final String RESOURCE_ROOT = "demo-scenarios/";
     private static final String DISCLAIMER =
-            "Synthetic demonstration data only. Never upload real payment, customer, card or bank information.";
+            "Synthetic data only. Never upload real payment, customer, card or bank information.";
     private static final List<ScenarioDefinition> DEFINITIONS =
             List.of(
                     new ScenarioDefinition(
@@ -36,7 +36,7 @@ public class ScenarioService {
                             "A multi-day close with several batches, refunds and documented exception assumptions."),
                     new ScenarioDefinition(
                             "failure-recovery",
-                            "Duplicate and invalid rows for demonstrating quarantine and restart safety."));
+                            "Duplicate and invalid rows to exercise quarantine and restart safety."));
     private static final Set<String> ALWAYS_DOWNLOADABLE_NAMES =
             Set.of(
                     "internal_transactions.csv",
@@ -155,7 +155,7 @@ public class ScenarioService {
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
                                         "SCENARIO_NOT_FOUND",
-                                        "No demonstration scenario exists with that slug."));
+                                        "No prepared scenario exists with that slug."));
     }
 
     private JsonNode manifest(String slug) {

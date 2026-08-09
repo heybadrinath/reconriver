@@ -1,14 +1,14 @@
 # Security policy
 
-## Demonstration boundary
+## Data handling boundary
 
-ReconRiver is a portfolio demonstration built for synthetic data. Do not upload real payment, customer, card, bank, or personally identifiable information. It is not production financial infrastructure and has not been assessed for regulated workloads.
+The hosted ReconRiver workspace accepts synthetic data only. Do not upload real payment, customer, card, bank, or personally identifiable information.
 
 ## Reporting a vulnerability
 
 Use the repository's private GitHub Security Advisory flow. Do not open a public issue with exploit details, tokens, credentials, or uploaded data. Include the affected version, reproduction steps, impact, and a minimal synthetic proof of concept.
 
-## Public demo controls
+## Hosted-service controls
 
 - Anonymous bearer tokens are scoped to one expiring workspace and stored only as keyed hashes.
 - Uploads are restricted by origin, type, size, row count, headers, row width, and rate.
@@ -17,4 +17,4 @@ Use the repository's private GitHub Security Advisory flow. Do not open a public
 - Expired workspaces are deleted automatically.
 - Secrets are supplied by environment variables and are never expected in source control.
 
-These controls reduce demo risk; they are not a substitute for production identity, authorization, audit retention, data classification, key management, malware scanning, or compliance review.
+Any change to the accepted data classification or access model requires a separate security and compliance review covering identity, authorization, retention, key management, malware scanning, and operational controls.

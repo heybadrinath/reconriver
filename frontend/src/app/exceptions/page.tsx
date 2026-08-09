@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -64,7 +64,23 @@ function ExceptionWorkbench() {
       }),
   });
   const items = exceptions.data?.items ?? [];
-  const effectiveSelectedId = selectedId ?? items[0]?.id ?? null;
+  const effectiveSelectedId =
+    (selectedId && items.some((item) => item.id === selectedId)
+      ? selectedId
+      : items[0]?.id) ?? null;
+  const inspectorRef = useRef<HTMLDivElement>(null);
+  const selectException = (id: string) => {
+    setSelectedId(id);
+    if (window.matchMedia("(min-width: 1280px)").matches) return;
+
+    window.requestAnimationFrame(() => {
+      inspectorRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      inspectorRef.current?.focus({ preventScroll: true });
+    });
+  };
   const detail = useQuery({
     queryKey: ["exception", effectiveSelectedId],
     queryFn: () => api.exception(effectiveSelectedId ?? ""),
@@ -104,9 +120,9 @@ function ExceptionWorkbench() {
   return (
     <>
       <PageIntro
-        eyebrow="Step 4 · Explain and decide"
-        title="Exception workbench"
-        description="Compare source evidence, read the failed rule and record a traceable operator decision. Resolution changes state; it never rewrites the original result."
+        eyebrow="Investigate · Decision queue"
+        title="Exceptions"
+        description="Compare the source evidence, understand the failed rule and record a traceable decision without changing the original result."
       />
       <div className="mb-3 flex flex-col gap-3 rounded-[var(--radius-card)] border border-[var(--border)] bg-white p-4 sm:flex-row sm:items-center">
         <ListFilter size={22} aria-hidden="true" />
@@ -189,12 +205,18 @@ function ExceptionWorkbench() {
                   key={item.id}
                   item={item}
                   selected={effectiveSelectedId === item.id}
-                  onSelect={() => setSelectedId(item.id)}
+                  onSelect={() => selectException(item.id)}
                 />
               ))}
             </div>
           </Card>
-          <div>
+          <div
+            ref={inspectorRef}
+            role="region"
+            aria-label="Selected exception details"
+            tabIndex={-1}
+            className="scroll-mt-24 rounded-[var(--radius-card)] focus:ring-3 focus:ring-[var(--focus)] focus:outline-none"
+          >
             {detail.isPending ? (
               <Card>
                 <CardContent className="grid min-h-96 place-items-center">
@@ -271,7 +293,7 @@ function ExceptionListItem({
       </p>
       <div className="mt-2 flex items-end justify-between gap-3">
         <p className="font-display text-2xl font-bold">
-          {formatMoney(item.difference, item.currency)} diff.
+          {formatMoney(item.difference, item.currency)} difference
         </p>
         <span
           className={cn(
@@ -444,13 +466,13 @@ function ExceptionInspector({
             >
               <Tabs.Trigger
                 value="decision"
-                className="rounded-full px-4 py-2 text-sm font-bold data-[state=active]:bg-[var(--ink)] data-[state=active]:text-white"
+                className="min-h-11 rounded-full px-4 py-2 text-sm font-bold focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-1 focus-visible:outline-none data-[state=active]:bg-[var(--ink)] data-[state=active]:text-white"
               >
                 Decision
               </Tabs.Trigger>
               <Tabs.Trigger
                 value="timeline"
-                className="rounded-full px-4 py-2 text-sm font-bold data-[state=active]:bg-[var(--ink)] data-[state=active]:text-white"
+                className="min-h-11 rounded-full px-4 py-2 text-sm font-bold focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-1 focus-visible:outline-none data-[state=active]:bg-[var(--ink)] data-[state=active]:text-white"
               >
                 Audit timeline
               </Tabs.Trigger>

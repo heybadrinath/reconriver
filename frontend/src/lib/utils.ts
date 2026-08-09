@@ -7,14 +7,33 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatMoney(
   value: number | string | null | undefined,
-  currency = "USD",
+  currency: string | null = "USD",
 ) {
   const numeric = typeof value === "string" ? Number(value) : (value ?? 0);
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(numeric) ? numeric : 0);
+  const safeNumeric = Number.isFinite(numeric) ? numeric : 0;
+  const normalizedCurrency = currency?.trim().toUpperCase();
+
+  if (!normalizedCurrency) {
+    const amount = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(safeNumeric);
+    return `${amount} (currency unavailable)`;
+  }
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: normalizedCurrency,
+      maximumFractionDigits: 2,
+    }).format(safeNumeric);
+  } catch (error) {
+    if (!(error instanceof RangeError)) throw error;
+    return `${safeNumeric.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} ${normalizedCurrency}`;
+  }
 }
 
 export function formatCount(value: number | null | undefined) {

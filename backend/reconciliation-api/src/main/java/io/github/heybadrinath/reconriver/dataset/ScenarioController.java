@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/demo/scenarios")
-@Tag(name = "Demonstration scenarios")
+@Tag(name = "Prepared scenarios")
 class ScenarioController {
     private final ScenarioService service;
 

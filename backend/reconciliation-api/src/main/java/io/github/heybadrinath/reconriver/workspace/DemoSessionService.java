@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class DemoSessionService {
     public static final String UPLOAD_WARNING =
-            "Use synthetic demonstration data only. Do not upload real payment, customer, card or bank information.";
+            "Use synthetic data only. Do not upload real payment, customer, card or bank information.";
 
     private final JdbcClient jdbc;
     private final DemoWorkspaceRepository workspaces;

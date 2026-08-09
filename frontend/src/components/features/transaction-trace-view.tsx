@@ -113,7 +113,7 @@ export function TransactionTraceView({
         description="The complete evidence chain from the internal ledger through processor and settlement batch to the bank, with every matching decision and audit event preserved."
         actions={
           <Button asChild variant="secondary">
-            <Link href="/exceptions">Back to workbench</Link>
+            <Link href="/exceptions">Back to exceptions</Link>
           </Button>
         }
       />

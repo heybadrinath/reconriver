@@ -20,7 +20,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const modules = [
   [
-    "Demo workspace",
+    "Workspace access",
     "Issues short-lived tokens and isolates every import, run and audit event.",
   ],
   [
@@ -41,9 +41,9 @@ export default function ArchitecturePage() {
   return (
     <AppShell>
       <PageIntro
-        eyebrow="Recruiter-friendly system tour"
-        title="Java architecture"
-        description="ReconRiver is intentionally a modular monolith: one deployable Spring Boot service with explicit domain boundaries, dependable transactions and no distributed-system ceremony."
+        eyebrow="Platform design"
+        title="System architecture"
+        description="ReconRiver uses a modular monolith so imports, reconciliation, exception decisions and audit events remain transactionally consistent behind explicit domain boundaries."
         actions={
           <Button asChild>
             <a
@@ -116,7 +116,7 @@ export default function ArchitecturePage() {
       </Card>
 
       <div className="data-grid mb-3">
-        <Card className="col-span-12 bg-[var(--violet-soft)] lg:col-span-7">
+        <Card className="col-span-12 overflow-hidden border-t-4 border-t-[var(--violet)] lg:col-span-7">
           <CardContent>
             <GitBranch size={28} aria-hidden="true" />
             <p className="utility-label mt-8 text-[var(--muted)]">
@@ -158,40 +158,40 @@ export default function ArchitecturePage() {
             icon: Repeat,
             title: "Restartable batches",
             text: "Chunk commits persist Spring Batch checkpoints. A failed execution resumes from durable progress without repeating completed work.",
-            tone: "bg-[var(--yellow-soft)]",
+            tone: "border-t-[var(--yellow)]",
           },
           {
             icon: Braces,
             title: "BigDecimal money",
             text: "Amounts, fees and differences use explicit scale and rounding. Binary floating point never decides a financial match.",
-            tone: "bg-[var(--green-soft)]",
+            tone: "border-t-[var(--green)]",
           },
           {
             icon: KeyRound,
             title: "Idempotent imports",
             text: "Workspace, source type and SHA-256 checksum form a duplicate boundary before any row is imported twice.",
-            tone: "bg-[var(--coral-soft)]",
+            tone: "border-t-[var(--coral)]",
           },
           {
             icon: Server,
             title: "Database locking",
             text: "PostgreSQL constraints and explicit locking protect competing workers and exception state transitions.",
-            tone: "bg-white",
+            tone: "border-t-[var(--ink)]",
           },
           {
             icon: ShieldCheck,
             title: "Append-only audit",
             text: "Resolution and reopen actions append actor, time and details. Original reconciliation facts are never overwritten.",
-            tone: "bg-[var(--violet-soft)]",
+            tone: "border-t-[var(--violet)]",
           },
           {
             icon: CircleCheck,
             title: "Testcontainers",
             text: "The integration-test design covers Flyway, constraints, CSV import, complete runs, restarts and workspace isolation against PostgreSQL containers.",
-            tone: "bg-white",
+            tone: "border-t-[var(--green)]",
           },
         ].map(({ icon: Icon, title, text, tone }) => (
-          <Card key={title} className={tone}>
+          <Card key={title} className={`border-t-4 ${tone}`}>
             <CardContent className="flex min-h-64 flex-col justify-between">
               <Icon size={27} aria-hidden="true" />
               <div className="mt-12">
@@ -251,10 +251,10 @@ export default function ArchitecturePage() {
       </Card>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        <Card className="bg-[var(--green-soft)]">
+        <Card className="overflow-hidden border-t-4 border-t-[var(--green)]">
           <CardContent>
             <p className="utility-label text-[var(--muted)]">
-              Free public deployment
+              Deployment topology
             </p>
             <h2 className="mt-3 font-display text-4xl font-bold uppercase">
               Vercel → Render → Neon
@@ -262,26 +262,25 @@ export default function ArchitecturePage() {
             <p className="mt-4 text-sm leading-7 text-[var(--muted-strong)]">
               Next.js is deployed separately from the containerized Java API.
               Exact CORS origins, environment-managed secrets, readiness probes
-              and expiring workspaces keep the public demo constrained. Free
-              instances can cold-start, so the interface reports that state
-              honestly.
+              and expiring workspaces define the hosted runtime boundary.
+              PostgreSQL preserves workspace and batch state independently of
+              the application container.
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-[var(--coral-soft)]">
+        <Card className="overflow-hidden border-t-4 border-t-[var(--coral)]">
           <CardContent>
             <p className="utility-label text-[var(--muted)]">
-              Limits and production path
+              Data and access boundary
             </p>
             <h2 className="mt-3 font-display text-4xl font-bold uppercase">
-              A portfolio system, not a bank.
+              Synthetic data, isolated workspaces.
             </h2>
             <p className="mt-4 text-sm leading-7 text-[var(--muted-strong)]">
-              The demo caps file size and row count, stores no identity and uses
-              generated data. A production version would add organization SSO,
-              encrypted object storage, processor-specific adapters, holiday
-              calendars, stronger observability, retention policies and formally
-              reviewed controls.
+              Workspace tokens expire after 24 hours. Upload limits, rate
+              controls and workspace-scoped queries constrain access, while
+              append-only audit entries preserve operator actions. The hosted
+              workspace accepts synthetic data only.
             </p>
           </CardContent>
         </Card>
@@ -297,7 +296,7 @@ export default function ArchitecturePage() {
           </div>
           <Button asChild variant="coral">
             <Link href="/scenarios">
-              Start the demo <ArrowRight size={18} aria-hidden="true" />
+              Open a workspace <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </Button>
         </CardContent>

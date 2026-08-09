@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { PageIntro } from "@/components/layout/page-intro";
+import { ReconcileProgress } from "@/components/layout/reconcile-progress";
 import { WorkspaceGate } from "@/components/layout/workspace-gate";
 import { ApiErrorState, EmptyState } from "@/components/states/api-state";
 import { StatusBadge } from "@/components/ui/badge";
@@ -125,9 +126,9 @@ function RunsContent() {
   return (
     <>
       <PageIntro
-        eyebrow="Step 3 · Execute deterministic rules"
-        title="Reconciliation runs"
-        description="Start a real Spring Batch job, watch checkpoint progress and restart an interrupted run from its last safe boundary."
+        eyebrow="Reconcile · Step 3 of 3"
+        title="Run reconciliation"
+        description="Compare every loaded record, monitor progress and resume an interrupted run from its last safe checkpoint."
         actions={
           <Button
             onClick={() => start.mutate()}
@@ -154,6 +155,7 @@ function RunsContent() {
           </Button>
         }
       />
+      <ReconcileProgress current={3} completedThrough={2} />
 
       {start.error ? (
         <div className="mb-3">
@@ -167,10 +169,10 @@ function RunsContent() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="utility-label text-white/45">
-                  Current worker state
+                  Current reconciliation
                 </p>
                 <h2 className="mt-2 font-display text-4xl font-bold uppercase">
-                  {active ? "Processing records" : "Worker ready"}
+                  {active ? "Processing records" : "Ready to reconcile"}
                 </h2>
               </div>
               {active ? (
@@ -191,7 +193,7 @@ function RunsContent() {
                   </p>
                   <p className="pb-1 text-sm text-white/55">
                     {formatCount(active.processedItems)} of{" "}
-                    {formatCount(active.totalWorkItems)} work items
+                    {formatCount(active.totalWorkItems)} records
                   </p>
                 </div>
                 <Progress
@@ -207,16 +209,17 @@ function RunsContent() {
             ) : (
               <p className="mt-12 max-w-xl text-sm leading-7 text-white/60">
                 {importReadiness.ready
-                  ? "Internal, processor and bank source files are ready for the next job."
+                  ? "Internal, processor and bank source files are ready for comparison."
                   : importReadiness.active.length > 0
                     ? `${importReadiness.readySourceCount} of 3 source types are ready. Run creation stays disabled until validation finishes.`
-                    : "Load or import a successful internal, processor and bank source before starting a job."}
+                    : "Load a valid internal, processor and bank source before starting reconciliation."}
               </p>
             )}
           </CardContent>
         </Card>
-        <Card className="col-span-12 bg-[var(--green-soft)] sm:col-span-6 lg:col-span-2">
-          <CardContent>
+        <Card className="col-span-12 overflow-hidden sm:col-span-6 lg:col-span-2">
+          <div className="h-1.5 bg-[var(--green)]" aria-hidden="true" />
+          <CardContent className="pt-4">
             <p className="utility-label text-[var(--muted)]">Completed</p>
             <p className="metric-number mt-10">
               {formatCount(
@@ -229,8 +232,9 @@ function RunsContent() {
             </p>
           </CardContent>
         </Card>
-        <Card className="col-span-12 bg-[var(--coral-soft)] sm:col-span-6 lg:col-span-3">
-          <CardContent>
+        <Card className="col-span-12 overflow-hidden sm:col-span-6 lg:col-span-3">
+          <div className="h-1.5 bg-[var(--coral)]" aria-hidden="true" />
+          <CardContent className="pt-4">
             <p className="utility-label text-[var(--muted)]">
               Restartable failures
             </p>
@@ -252,7 +256,7 @@ function RunsContent() {
               size={24}
               aria-hidden="true"
             />
-            <p>Loading genuine run history…</p>
+            <p>Loading run history…</p>
           </CardContent>
         </Card>
       ) : runs.error ? (
@@ -262,7 +266,7 @@ function RunsContent() {
           title="No reconciliation runs"
           description={
             importReadiness.ready
-              ? "Validated sources are ready. Start reconciliation to create the first batch job."
+              ? "Validated sources are ready. Start the first reconciliation."
               : importReadiness.active.length > 0
                 ? "Source validation is still running. Review imports and wait for all three sources before starting."
                 : "Load or upload all three source types before starting reconciliation."
@@ -299,7 +303,7 @@ function RunsContent() {
               />
               <div>
                 <h2 className="font-display text-3xl font-bold uppercase">
-                  A job can be restarted
+                  A reconciliation can be resumed
                 </h2>
                 <p className="mt-1 text-sm text-[var(--muted-strong)]">
                   Open the failed run to review its error and continue from the

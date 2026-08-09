@@ -60,11 +60,49 @@ describe("Scenario file details", () => {
     );
 
     fireEvent.click(
-      await screen.findByRole("button", { name: /Mixed exceptions/i }),
+      await screen.findByRole("radio", { name: /Mixed exceptions/i }),
     );
+    fireEvent.click(await screen.findByText("View 1 input file"));
 
     expect(
       await screen.findByText(/Supporting artifact · 1 row/),
     ).toBeVisible();
+  });
+
+  it("surfaces one load action and keeps the file inventory collapsed initially", async () => {
+    vi.spyOn(api, "scenarios").mockResolvedValue({ items: [scenario] });
+    vi.spyOn(api, "scenario").mockResolvedValue({
+      ...scenario,
+      availableFiles: [
+        {
+          fileName: "processor.csv",
+          sourceType: "PROCESSOR",
+          rowCount: 1000,
+          checksum: "a".repeat(64),
+          downloadUrl:
+            "/api/v1/demo/scenarios/mixed-exceptions/files/processor.csv",
+        },
+      ],
+    });
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    const { container } = render(
+      <QueryClientProvider client={client}>
+        <ScenariosPage />
+      </QueryClientProvider>,
+    );
+
+    expect(await screen.findByText("View 1 input file")).toBeVisible();
+    expect(
+      screen.getAllByRole("button", { name: "Load sources" }),
+    ).toHaveLength(1);
+
+    const inventory = container.querySelector("details");
+    expect(inventory).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByText("View 1 input file"));
+    expect(inventory).toHaveAttribute("open");
   });
 });

@@ -16,12 +16,15 @@ describe("API client", () => {
     vi.restoreAllMocks();
   });
 
-  it("maps a network failure to a recoverable backend state", async () => {
+  it("maps a network failure to a recoverable service state", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("offline"));
 
     await expect(api.scenarios()).rejects.toMatchObject({
       status: 0,
-      problem: { code: "BACKEND_UNAVAILABLE" },
+      problem: {
+        code: "BACKEND_UNAVAILABLE",
+        title: "Service unavailable",
+      },
     });
   });
 

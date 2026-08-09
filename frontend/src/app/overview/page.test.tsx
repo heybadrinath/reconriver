@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -71,5 +71,14 @@ describe("Overview result loading", () => {
     await waitFor(() => {
       expect(resultsSpy).toHaveBeenCalledWith("run-1", 0, 100);
     });
+
+    expect(
+      await screen.findByRole("heading", { name: "Settlement aging sample" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Based on 0 of 0 results loaded in this view.*authoritative paginated result set/i,
+      ),
+    ).toBeInTheDocument();
   });
 });

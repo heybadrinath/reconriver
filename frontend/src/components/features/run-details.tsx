@@ -216,7 +216,7 @@ export function RunDetails({ runId }: { runId: string }) {
       <PageIntro
         eyebrow={`Run · ${runId}`}
         title="Run details"
-        description="This screen polls the Spring Batch execution itself. Progress, counters, totals and results are never synthesized in the browser."
+        description="Track the current run, review its totals and inspect every reconciliation decision."
         actions={
           <>
             {restartable ? (
@@ -226,7 +226,7 @@ export function RunDetails({ runId }: { runId: string }) {
                 disabled={restart.isPending}
               >
                 <RefreshCw size={18} aria-hidden="true" />
-                Restart job
+                Resume run
               </Button>
             ) : null}
             {completed ? (
@@ -265,7 +265,7 @@ export function RunDetails({ runId }: { runId: string }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="utility-label text-white/45">
-                  Spring Batch execution
+                  Reconciliation progress
                 </p>
                 <div className="mt-3">
                   <StatusBadge value={status} />
@@ -312,21 +312,21 @@ export function RunDetails({ runId }: { runId: string }) {
           </CardContent>
         </Card>
         {[
-          ["Matched", summary.data?.matchedCount, "bg-[var(--green-soft)]"],
+          ["Matched", summary.data?.matchedCount, "border-t-[var(--green)]"],
           [
             "Exceptions",
             summary.data?.exceptionCount,
-            "bg-[var(--coral-soft)]",
+            "border-t-[var(--coral)]",
           ],
           [
             "Duration",
             formatDuration(summary.data?.durationMillis),
-            "bg-[var(--yellow-soft)]",
+            "border-t-[var(--yellow)]",
           ],
         ].map(([label, value, tone]) => (
           <Card
             key={String(label)}
-            className={`col-span-12 sm:col-span-4 lg:col-span-2 ${String(tone)}`}
+            className={`col-span-12 border-t-4 bg-[var(--surface)] sm:col-span-4 lg:col-span-2 ${String(tone)}`}
           >
             <CardContent>
               <p className="utility-label text-[var(--muted)]">{label}</p>
@@ -346,11 +346,10 @@ export function RunDetails({ runId }: { runId: string }) {
             <div>
               <StatusBadge value="FAILED" />
               <h2 className="mt-3 font-display text-4xl font-bold uppercase">
-                The batch job stopped
+                Reconciliation stopped
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted-strong)]">
-                {failureMessage ??
-                  "The worker did not return a failure description."}
+                {failureMessage ?? "No failure description was returned."}
               </p>
               <p className="mt-2 text-xs text-[var(--muted)]">
                 {restartable
@@ -418,7 +417,7 @@ export function RunDetails({ runId }: { runId: string }) {
 
                         aria-hidden="true"
                       />
-                      Open workbench
+                      Review exceptions
                     </Link>
                   </Button>
                 </div>
@@ -450,8 +449,8 @@ export function RunDetails({ runId }: { runId: string }) {
             <div>
               <p className="font-bold">Reconciliation is still running</p>
               <p className="text-sm text-[var(--muted)]">
-                Summary, distributions and results appear after the batch job
-                reaches a terminal state.
+                Summary, distributions and results appear when reconciliation
+                finishes.
               </p>
             </div>
           </CardContent>

@@ -888,7 +888,7 @@
     },
     "securitySchemes": {
       "bearerAuth": {
-        "bearerFormat": "opaque demo session token",
+        "bearerFormat": "opaque workspace token",
         "scheme": "bearer",
         "type": "http"
       }
@@ -983,7 +983,7 @@
         "security": [],
         "summary": "List deterministic synthetic scenarios",
         "tags": [
-          "Demonstration scenarios"
+          "Prepared scenarios"
         ]
       }
     },
@@ -1014,7 +1014,7 @@
         },
         "security": [],
         "tags": [
-          "Demonstration scenarios"
+          "Prepared scenarios"
         ]
       }
     },
@@ -1054,7 +1054,7 @@
         },
         "security": [],
         "tags": [
-          "Demonstration scenarios"
+          "Prepared scenarios"
         ]
       }
     },
@@ -1085,7 +1085,7 @@
         },
         "summary": "Load a scenario through the same import pipeline used by uploads",
         "tags": [
-          "Demonstration scenarios"
+          "Prepared scenarios"
         ]
       }
     },
@@ -1105,9 +1105,9 @@
           }
         },
         "security": [],
-        "summary": "Start an isolated 24-hour demonstration workspace",
+        "summary": "Start an isolated 24-hour workspace",
         "tags": [
-          "Demo sessions"
+          "Workspace sessions"
         ]
       }
     },
@@ -1355,7 +1355,7 @@
         ]
       },
       "post": {
-        "description": "Use synthetic demonstration data only. Do not upload real payment, customer, card or bank information.",
+        "description": "Use synthetic data only. Do not upload real payment, customer, card or bank information.",
         "operationId": "upload",
         "parameters": [
           {

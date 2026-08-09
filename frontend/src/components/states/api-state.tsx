@@ -47,9 +47,10 @@ export function ColdStartState() {
     >
       <Hourglass className="mt-0.5 shrink-0" size={20} aria-hidden="true" />
       <div>
-        <p className="font-bold">The backend is waking up.</p>
+        <p className="font-bold">The service is starting.</p>
         <p className="text-sm text-[var(--muted-strong)]">
-          This can take several minutes on the free demo. Keep this page open.
+          This can take several minutes after a period of inactivity. Keep this
+          page open.
         </p>
       </div>
     </div>

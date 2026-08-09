@@ -89,17 +89,17 @@ function OverviewContent() {
     return (
       <>
         <PageIntro
-          eyebrow="Workspace intelligence"
-          title="Overview"
-          description="A completed reconciliation run will populate this workspace with real totals, exception values and settlement flows."
+          eyebrow="Workspace dashboard"
+          title="Reconciliation overview"
+          description="Choose a prepared data set and complete reconciliation to see totals, exception exposure and settlement flows."
         />
         <EmptyState
           title="No completed run yet"
-          description="Load a synthetic scenario and run reconciliation. This page does not display placeholder metrics."
+          description="Choose a scenario, review its three source files and run reconciliation to populate this dashboard."
           action={
             <Button asChild>
-              <Link href="/runs">
-                Go to runs <ArrowRight size={18} aria-hidden="true" />
+              <Link href="/scenarios">
+                Choose a scenario <ArrowRight size={18} aria-hidden="true" />
               </Link>
             </Button>
           }
@@ -116,16 +116,18 @@ function OverviewContent() {
     );
   const data = summary.data;
   const resultItems = results.data?.items ?? [];
-  const aging = ageBuckets(resultItems);
+  const agingSample = ageBuckets(resultItems);
   const maxOutcome = Math.max(...Object.values(data?.outcomes ?? {}), 1);
-  const maxAge = Math.max(...Object.values(aging), 1);
+  const maxAge = Math.max(...Object.values(agingSample), 1);
+  const sampledResultCount = resultItems.length;
+  const totalResultCount = results.data?.totalElements ?? sampledResultCount;
 
   return (
     <>
       <PageIntro
         eyebrow={`Latest completed run · ${latest.id}`}
-        title="Settlement overview"
-        description="A source-of-truth view of the latest completed Spring Batch run. Open a flow or exception to see why the service reached its decision."
+        title="Reconciliation overview"
+        description="Latest reconciliation totals, exception exposure and settlement timing. Open any flow to inspect the decision evidence."
         actions={
           <Button asChild variant="secondary">
             <Link href={`/runs/${latest.id}`}>
@@ -136,53 +138,81 @@ function OverviewContent() {
       />
 
       <div className="data-grid mb-3">
-        <Card className="col-span-12 bg-[var(--ink)] text-white md:col-span-7">
+        <Card className="col-span-12 md:col-span-7">
           <CardContent>
-            <p className="utility-label text-white/45">Total processed</p>
-            <p className="metric-number mt-8">
-              {formatCount(data?.totalResults)}
-            </p>
-            <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="utility-label text-white/45">Matched</p>
-                <p className="mt-1 font-display text-3xl font-bold text-[var(--green)]">
+                <p className="utility-label text-[var(--muted)]">
+                  Total processed
+                </p>
+                <p className="metric-number mt-4">
+                  {formatCount(data?.totalResults)}
+                </p>
+              </div>
+              <span className="rounded-full bg-[var(--green-soft)] px-3 py-1 text-sm font-bold">
+                {data ? `${data.matchedRate.toFixed(1)}% matched` : "—"}
+              </span>
+            </div>
+            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
+                <p className="utility-label text-[var(--muted)]">Matched</p>
+                <p className="mt-2 font-display text-3xl font-bold">
                   {formatCount(data?.matchedCount)}
                 </p>
+                <div className="mt-4 h-2 rounded-full bg-white">
+                  <div
+                    className="h-full rounded-full bg-[var(--green)]"
+                    style={{ width: `${data?.matchedRate ?? 0}%` }}
+                  />
+                </div>
               </div>
-              <div>
-                <p className="utility-label text-white/45">Match rate</p>
-                <p className="mt-1 font-display text-3xl font-bold">
-                  {data ? `${data.matchedRate.toFixed(1)}%` : "—"}
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
+                <p className="utility-label text-[var(--muted)]">Exceptions</p>
+                <p className="mt-2 font-display text-3xl font-bold">
+                  {formatCount(data?.exceptionCount)}
                 </p>
+                <div className="mt-4 h-2 rounded-full bg-white">
+                  <div
+                    className="h-full rounded-full bg-[var(--coral)]"
+                    style={{ width: `${100 - (data?.matchedRate ?? 100)}%` }}
+                  />
+                </div>
               </div>
-              <div>
-                <p className="utility-label text-white/45">Duration</p>
-                <p className="mt-1 font-display text-3xl font-bold">
+              <div className="col-span-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4 sm:col-span-1">
+                <p className="utility-label text-[var(--muted)]">Duration</p>
+                <p className="mt-2 font-display text-3xl font-bold">
                   {formatDuration(data?.durationMillis)}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-6 bg-[var(--coral-soft)] md:col-span-2">
+        <Card className="col-span-12 bg-[var(--ink)] text-white md:col-span-5">
           <CardContent>
-            <p className="utility-label text-[var(--muted)]">Open exceptions</p>
-            <p className="metric-number mt-10 text-[var(--coral-strong)]">
-              {formatCount(data?.openExceptions)}
-            </p>
+            <p className="utility-label text-white/45">Reconciliation health</p>
+            <div className="mt-8 flex items-end justify-between gap-4">
+              <div>
+                <p className="metric-number text-[var(--coral)]">
+                  {formatCount(data?.openExceptions)}
+                </p>
+                <p className="mt-2 text-sm text-white/60">open exceptions</p>
+              </div>
+              <Button asChild variant="secondary">
+                <Link href="/exceptions">
+                  Investigate <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+            <div className="mt-8 border-t border-white/10 pt-5">
+              <p className="utility-label text-white/45">Unreconciled value</p>
+              <p className="mt-2 font-display text-4xl font-bold">
+                {formatMoney(data?.unreconciledValue)}
+              </p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="col-span-6 bg-[var(--yellow-soft)] md:col-span-3">
-          <CardContent>
-            <p className="utility-label text-[var(--muted)]">
-              Unreconciled value
-            </p>
-            <p className="mt-10 font-display text-5xl leading-none font-bold">
-              {formatMoney(data?.unreconciledValue)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="col-span-6 bg-[var(--green-soft)] md:col-span-3">
+        <Card className="col-span-6 overflow-hidden md:col-span-3">
+          <div className="h-1.5 bg-[var(--yellow)]" aria-hidden="true" />
           <CardContent>
             <p className="utility-label text-[var(--muted)]">
               Settlement batches
@@ -192,15 +222,17 @@ function OverviewContent() {
             </p>
           </CardContent>
         </Card>
-        <Card className="col-span-6 md:col-span-3">
+        <Card className="col-span-6 overflow-hidden md:col-span-3">
+          <div className="h-1.5 bg-[var(--green)]" aria-hidden="true" />
           <CardContent>
-            <p className="utility-label text-[var(--muted)]">Job duration</p>
+            <p className="utility-label text-[var(--muted)]">Run duration</p>
             <p className="mt-10 font-display text-5xl leading-none font-bold">
               {formatDuration(data?.durationMillis)}
             </p>
           </CardContent>
         </Card>
-        <Card className="col-span-12 bg-[var(--violet-soft)] md:col-span-6">
+        <Card className="col-span-12 overflow-hidden md:col-span-6">
+          <div className="h-1.5 bg-[var(--violet)]" aria-hidden="true" />
           <CardContent>
             <p className="utility-label text-[var(--muted)]">Operator queue</p>
             <div className="mt-8 flex items-end justify-between gap-4">
@@ -276,13 +308,13 @@ function OverviewContent() {
         <Card>
           <CardContent>
             <p className="utility-label text-[var(--muted)]">
-              Processor event → bank booking
+              Displayed result sample · processor event → bank booking
             </p>
             <h2 className="mt-2 font-display text-4xl font-bold uppercase">
-              Settlement aging
+              Settlement aging sample
             </h2>
             <div className="mt-6 space-y-4">
-              {Object.entries(aging).map(([label, value]) => (
+              {Object.entries(agingSample).map(([label, value]) => (
                 <div key={label}>
                   <div className="mb-1.5 flex justify-between text-xs">
                     <span className="font-bold">{label}</span>
@@ -297,6 +329,11 @@ function OverviewContent() {
                 </div>
               ))}
             </div>
+            <p className="mt-5 text-xs leading-5 text-[var(--muted)]">
+              Based on {formatCount(sampledResultCount)} of{" "}
+              {formatCount(totalResultCount)} results loaded in this view. Open
+              the run for the authoritative paginated result set.
+            </p>
           </CardContent>
         </Card>
       </div>

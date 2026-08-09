@@ -138,7 +138,7 @@ async function request<T>(
   } catch {
     throw new ApiError(0, {
       code: "BACKEND_UNAVAILABLE",
-      title: "Backend unavailable",
+      title: "Service unavailable",
       detail:
         "The reconciliation service could not be reached. It may still be waking up; try again in a moment.",
     });
@@ -321,14 +321,14 @@ export function classifyApiError(error: unknown) {
   }
   if (error.status === 401 || error.status === 403) {
     return {
-      title: "Demo session expired",
+      title: "Workspace expired",
       message: "Start a new workspace to continue.",
       action: "Start new workspace",
     };
   }
   if (error.status === 429) {
     return {
-      title: "Demo limit reached",
+      title: "Request limit reached",
       message:
         "This workspace is sending requests too quickly. Wait a moment and retry.",
       action: "Retry",
@@ -339,7 +339,7 @@ export function classifyApiError(error: unknown) {
       title: "Service temporarily unavailable",
       message:
         error.problem.detail ??
-        "The backend or database is unavailable. Try again after it recovers.",
+        "The service is temporarily unavailable. Try again shortly.",
       action: "Retry",
     };
   }

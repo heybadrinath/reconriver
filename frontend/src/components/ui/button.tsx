@@ -5,24 +5,24 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border text-sm font-bold transition-[background-color,color,border-color,transform] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--focus)] disabled:pointer-events-none disabled:opacity-45 motion-safe:hover:-translate-y-px",
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border text-sm font-bold transition-[background-color,color,border-color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--focus)] disabled:pointer-events-none disabled:opacity-45",
   {
     variants: {
       variant: {
         primary:
           "border-[var(--ink)] bg-[var(--ink)] px-5 text-white hover:bg-[#292b2b]",
         secondary:
-          "border-[var(--border-strong)] bg-[var(--surface)] px-5 text-[var(--ink)] hover:bg-white",
+          "border-[var(--border-strong)] bg-[var(--surface)] px-5 text-[var(--ink)] hover:border-[var(--ink)] hover:bg-white",
         coral:
           "border-[var(--coral-strong)] bg-[var(--coral)] px-5 text-[var(--ink)] hover:bg-[#ff6b52]",
         ghost:
           "border-transparent bg-transparent px-3 text-[var(--ink)] hover:bg-[var(--surface-muted)]",
-        icon: "size-11 border-[var(--border)] bg-[var(--surface)] p-0 text-[var(--ink)] hover:bg-white",
+        icon: "size-12 border-[var(--border)] bg-[var(--surface)] p-0 text-[var(--ink)] hover:bg-white",
         danger:
           "border-[var(--critical)] bg-[var(--critical)] px-5 text-white hover:bg-[#b72e27]",
       },
       size: {
-        default: "h-11",
+        default: "h-12",
         sm: "min-h-11 px-4 text-xs sm:min-h-9",
         lg: "min-h-13 px-6 text-base",
       },
