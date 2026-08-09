@@ -25,6 +25,8 @@ Start an anonymous workspace, load **Mixed exceptions**, and let the API import 
 
 ![Live ReconRiver run workbench](docs/assets/reconriver-live-workbench.jpg)
 
+![Live ReconRiver mobile River](docs/assets/reconriver-live-mobile-river.jpg)
+
 ## Architecture
 
 ```mermaid
@@ -77,8 +79,14 @@ Additional live operations evidence:
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Maximum public import boundary | A 25,000-row synthetic internal-ledger CSV imported 25,000/25,000 rows with 0 quarantined in 260 s                                                                        |
 | Rolling service replacement    | The replacement started Spring in 210.494 s; the existing service remained available, and the same workspace retained 1,244 results plus its resolve/reopen audit entries |
+| Genuine idle wake              | After 20m19.9s without public API activity, the UI showed its wake state and reached a real workspace by 266.5 s (4m26.5s) after the first user action                    |
+| Final deployed mobile journey  | Run `200291e1-8569-472d-ad2a-f1a5204da843` completed with 1,244 results: 1,007 matched and 237 exceptions in 42.4 s                                                       |
 
 No public downtime was observed during that rolling replacement. This is persistence and rollout evidence from one event, not a high-availability claim or a measurement of an idle-service cold start.
+
+For the separate idle-wake check, the UI exposed a live `role="status"` message—**The backend is waking up. This can take several minutes...**—and disabled both start actions by +5.3 s. Render started the container at +5.057 s, logged Spring startup at +25.802 s, and reported the application started in 211.098 s (+226.501 s from the click). The browser still showed the wake state at +243.085 s and was on `/scenarios` with a real workspace by +266.512 s. Therefore 266.5 s is an observed upper bound for the end-to-end transition, not an exact response time.
+
+The final deployed 375 × 844 mobile audit measured no horizontal document overflow, all 49 visible application-owned targets at 44 × 44 px or larger, a visible 301 px-wide vertical River, and no desktop River SVG. Axe recorded 29 passes, 0 violations, and 0 incomplete checks; the console recorded 0 warnings or errors; reduced-motion mode left 0 animated elements. Representative focus rings were visible, while natural sequential Tab order is not claimed as manually verified.
 
 The public Hugging Face repository exposes all 16 scenario/file configurations in Dataset Viewer. The downloaded artifacts were checked against all 32 committed SHA-256 entries, and the committed generator reproduces the CSV, JSON, ZIP, and documentation artifacts byte for byte from seed `42` and fixed start date `2026-01-01`.
 
@@ -98,6 +106,7 @@ Each pack includes three source CSVs, exact expected reconciliation output, a ma
 - Maven `verify` on Java 21: 32 tests — 16 API tests, including seven PostgreSQL Testcontainers journeys, plus 16 generator tests — with Spotless formatting and Spring Modulith boundary verification.
 - Frontend: Prettier, ESLint, TypeScript, 35 Vitest unit/accessibility tests across 12 files, and a Next.js production build.
 - Browser journey: two Playwright projects (desktop Chromium and mobile Chromium) against real API results, covering scenario load, imports, reconciliation, resolve, reopen, audit history, CSV export, and axe checks.
+- Final production mobile audit: WCAG 2.0/2.1/2.2 A/AA axe scan, 44 px target sizing, overflow, reduced motion, River layout, representative focus rings, and console output.
 - Contract drift: running Spring OpenAPI versus the committed document, then committed OpenAPI versus generated TypeScript.
 - Packaging: executable JAR and repository-root Docker build, runtime smoke journey under `-Xmx320m`, and non-root container execution as UID `10001`.
 - Data publication: schema validation, row counts, reproducibility, manifest hashes, archives, and all 16 Hugging Face Viewer configurations.
@@ -153,7 +162,7 @@ Dataset reproducibility additionally requires `check-jsonschema`:
 
 The live Render service was created through Render's official API using the checked-in `render.yaml` values. It is not Blueprint-linked, and automatic deployment is disabled so a tested commit can be promoted deliberately. Database credentials and the generated token-hash secret exist only in Render.
 
-The maximum 25,000-row public import boundary is verified above. A genuine idle-to-ready cold start is intentionally not reported as observed production evidence until its dedicated check is recorded.
+The maximum 25,000-row public import boundary and genuine idle-to-workspace wake are both verified above. Free-service wake time varies; the single observation is not a service-level guarantee.
 
 ## Documentation
 

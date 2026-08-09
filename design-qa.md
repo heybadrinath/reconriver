@@ -1,8 +1,8 @@
 # Design QA
 
-**final result: blocked**
+**final result: passed**
 
-The stable frontend and API are public, and production desktop/mobile captures now cover the landing page and real reconciliation workbench. The combined reference comparison found no P0–P2 visual mismatch. Final acceptance remains blocked while one serious mobile axe incomplete is corrected and redeployed, and until the genuine cold-start state is recorded.
+The stable frontend and API are public. Production desktop/mobile captures cover the landing page and real reconciliation workbench, while DOM and Render timing evidence cover the genuine idle-wake state. Final deployed desktop and mobile audits are green, and comparison against both supplied references found no P0–P2 visual mismatch.
 
 ## Visual truth and evidence
 
@@ -18,10 +18,7 @@ The stable frontend and API are public, and production desktop/mobile captures n
   - [Desktop workbench capture](docs/assets/reconriver-live-workbench.jpg) — live desktop Reconciliation River and run workbench at 1585 × 892 px.
   - [Mobile landing capture](docs/assets/reconriver-live-mobile.png) — live mobile landing page at 375 × 844 px.
   - [Mobile workbench capture](docs/assets/reconriver-live-mobile-workbench.png) — live mobile run heading, progress, and summary cards at 375 × 844 px; the River is below this viewport.
-- Combined comparison inputs:
-  - `frontend/.design-qa/final-local-comparison.png` — all three images displayed at equal panel width on one 1600 × 900 canvas.
-  - `frontend/.design-qa/final-local-comparison-focused.png` — enlarged desktop shell/controls and mobile hierarchy crops on one 1600 × 900 canvas.
-  - `frontend/.design-qa/reconriver-production-comparison.jpg` — local-only comparison of both supplied references with live desktop and 375 px states; excluded from publication because the references are third-party art direction.
+  - [Mobile River capture](docs/assets/reconriver-live-mobile-river.jpg) — final deployed vertical River cards at 375 × 844 px.
 - States: public landing page and API-backed mixed-exceptions overview/workbench, at desktop and mobile widths.
 
 The source images are art-direction references rather than screen-for-screen product mocks. Comparisons therefore judge the requested visual language—shell, hierarchy, density, contrast, typography, controls, semantic color, and responsive discipline—without treating domain-specific content differences as drift.
@@ -47,16 +44,19 @@ The result stays specific to reconciliation: ledger-to-processor-to-batch-to-ban
 - The local landing page emitted no browser console warnings or errors during the checked states.
 - Frontend unit/accessibility suite: 12 files and 35 tests passed.
 - Two Playwright projects—desktop Chromium and mobile Chromium—passed the real-API journey locally, including scenario loading, imports, reconciliation, resolve/reopen, audit history, CSV download, and axe checks.
-- The deployed desktop axe scan recorded 29 passes, 0 violations, and 0 incomplete checks. The deployed mobile scan recorded 29 passes, 0 violations, and 1 serious incomplete check for an `aria-label` on a roleless mobile River container; this is being corrected before acceptance.
-- The deployed landing and workbench checks emitted 0 browser console warnings or errors.
-- At the mobile run-detail route, River cards stack vertically and the desktop SVG is hidden rather than compressed off-screen.
-- Reduced-motion behavior and the Reconciliation River's equivalent table are covered in the frontend tests; the final redeploy must repeat mobile axe plus keyboard, focus, console, overflow, and visual checks.
+- The final deployed mobile run `200291e1-8569-472d-ad2a-f1a5204da843` completed with 1,244 results: 1,007 matched and 237 exceptions in 42.4 seconds.
+- At 375 × 844, window inner width, document client width, and document scroll width were all 375 px with `scrollX=0`. Only the equivalent result table's intentional 780 px minimum width exceeded the viewport, and it remained inside its horizontal-overflow container.
+- All 49 visible application-owned interactive targets measured at least 44 × 44 px. The vertical mobile River `role="group"` was visible at 301 px wide; the desktop SVG was absent or hidden.
+- The final mobile axe scan for WCAG 2.0, 2.1, and 2.2 A/AA recorded 29 passes, 0 violations, and 0 incomplete checks. The deployed page emitted 0 console warnings or errors.
+- With `prefers-reduced-motion` matched, the deployed page had zero animated elements.
+- Visible production focus rings were verified on representative controls: logo (152 × 44), menu (44 × 44), export (151 × 44), mobile flow (301 × 317), and summary disclosure (267 × 48). The local keyboard River test remains green; natural sequential Tab order was not separately claimed.
+- After 20m19.9s without public API activity, the live **Start with synthetic data** action triggered the real cold path. By +5.3 seconds, the DOM exposed `role="status"` with **The backend is waking up. This can take several minutes...**, and both start actions were disabled. The browser reached `/scenarios` with a real workspace by +266.512 seconds, so the end-to-end result is recorded as an observed 266.5-second upper bound rather than an exact response time.
+- Reduced-motion behavior and the Reconciliation River's equivalent table are also covered in the frontend tests.
 
 ## Findings
 
-- No local P0, P1, or P2 visual finding remains.
-- **Blocking accessibility follow-up:** axe could not complete one mobile River name check because `aria-label` was placed on a `div` without an applicable role. It reported an incomplete, not a violation, but the markup is being corrected rather than waived.
-- **Remaining evidence gap:** repeat the mobile production audit after redeployment and record the genuine cold-start message/state.
+- No local or deployed P0, P1, or P2 visual or accessibility finding remains in the checked states.
+- The free service's observed 266.5-second cold-wake upper bound is a disclosed platform limitation, not a design-QA failure: the UI announced the state and prevented duplicate starts.
 
 ## Comparison history
 
@@ -72,9 +72,15 @@ The result stays specific to reconciliation: ledger-to-processor-to-batch-to-ban
 
 ### Iteration 3
 
-- The production comparison combines both supplied references with the live desktop landing/workbench and live 375 px landing/workbench captures.
+- The final reference review compared both supplied references with the live desktop landing/workbench and live 375 px landing/workbench captures.
 - Review found no P0, P1, or P2 mismatch. The implementation carries the pale shell, dense bordered cards, black anchor surface, condensed type, semantic contrast, and disciplined mobile stacking without copying reference assets or layouts.
 - Apparent landing clipping in an earlier image was a capture artifact, not layout overflow. A 390 px DOM check measured document `scrollWidth` equal to the viewport, with the full header and hero visible. The mobile run DOM exposes the vertical **Reconciliation flows in mobile layout** region while the desktop SVG is hidden.
+
+### Iteration 4
+
+- The initial deployed mobile axe scan returned one serious incomplete check because the River's `aria-label` was attached to a roleless container. It was not waived.
+- Fix: give the mobile River an explicit group role, retain its accessible name, and raise remaining application-owned mobile controls to the 44 × 44 px target.
+- Post-deployment evidence: 29 axe passes, 0 violations, 0 incomplete checks; all 49 visible application-owned targets met the size threshold; overflow, reduced-motion, console, River-layout, and representative focus-ring checks passed.
 
 ## Final acceptance checklist
 
@@ -82,6 +88,6 @@ The result stays specific to reconciliation: ledger-to-processor-to-batch-to-ban
 - [x] Run the real desktop and mobile browser journey with no mocked API results.
 - [x] Capture production landing and API-backed workbench screens at desktop and mobile widths.
 - [x] Record desktop/mobile overflow, console, responsive River, and initial axe evidence.
-- [x] Build the combined reference-versus-production comparison and verify no P0–P2 visual mismatch.
-- [ ] Redeploy the mobile River accessibility correction and repeat the affected checks.
-- [ ] Capture the genuine idle-service cold-start message/state.
+- [x] Complete the final review against both supplied references and verify no P0–P2 visual mismatch.
+- [x] Capture the genuine idle-service cold-start message/state and the transition to a real workspace.
+- [x] Redeploy the mobile River accessibility correction and repeat the affected checks.

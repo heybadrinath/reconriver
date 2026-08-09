@@ -20,6 +20,10 @@ The month-end and recovery scenarios each begin with 10,000 canonical payments. 
 
 The production import-boundary check accepted a 25,000-row synthetic internal-ledger CSV, imported 25,000/25,000 rows, quarantined none, and completed in 260 seconds. During a separate rolling service replacement, the new Spring process started in 210.494 seconds while the existing public service remained available. The same workspace still held its 1,244 results and resolve/reopen audit entries afterward. This proves that those records were durable in Neon across that replacement; one no-downtime observation is not an availability guarantee.
 
+The genuine cold-start check began after 20m19.9s without public API activity. The browser showed the accessible backend-wake message and disabled both start actions by +5.3 seconds; Render reported the application started in 211.098 seconds (+226.501 seconds from the click), and the browser reached `/scenarios` with a real workspace by +266.512 seconds. Describe that result as “observed by 4m26.5s” or “a 266.5-second upper bound,” not as an exact response time or a guaranteed cold-start duration.
+
+The final deployed mobile audit used run `200291e1-8569-472d-ad2a-f1a5204da843`, which completed with 1,244 results—1,007 matched and 237 exceptions—in 42.4 seconds. At 375 × 844, the document had no horizontal overflow, all 49 visible application-owned targets measured at least 44 × 44 px, the 301 px-wide vertical River was visible, and the desktop SVG was absent. Axe recorded 29 passes, 0 violations, and 0 incomplete checks for WCAG 2.0/2.1/2.2 A/AA; the console recorded no warnings or errors; and reduced-motion mode left no animated elements. Representative production focus rings and the local keyboard River test were verified, but do not claim a separate manual proof of natural sequential Tab order.
+
 ## End-to-end data flow
 
 1. `POST /api/v1/demo/sessions` creates a workspace and returns a raw bearer token once. Only a keyed hash is stored.
@@ -96,10 +100,11 @@ Events document meaningful transitions such as import completed, reconciliation 
 - The verified frontend gate contains 35 Vitest unit/accessibility tests across 12 files, plus formatting, lint, type checking, OpenAPI-to-TypeScript drift, and the Next.js production build.
 - Two Playwright projects—desktop Chromium and mobile Chromium—passed the real anonymous journey from scenario load through resolve, reopen, audit, report download, and axe checks without stubbing API results. Keep local browser proof distinct from the final production visual record.
 - The executable JAR and repository-root Docker image passed runtime checks under a 320 MB heap. The image runs as UID `10001`. The contract gate compares the running Spring OpenAPI document to the committed document and regenerates TypeScript from that committed contract.
+- The final production mobile audit separately verified the real mixed-exceptions result, exact viewport containment, 49 application-owned target sizes, mobile-only River layout, axe, reduced motion, representative focus rings, and a clean console. Natural sequential Tab order is not presented as manually verified.
 
 ## Free deployment compromises
 
-- The backend scales down after inactivity. Initial deployment readiness was 207 seconds and a rolling replacement started Spring in 210.494 seconds, but neither is a genuine idle-to-ready wake measurement.
+- The backend scales down after inactivity. Initial deployment readiness was 207 seconds, a rolling replacement started Spring in 210.494 seconds, and one genuine idle-to-workspace transition was observed by 266.5 seconds after 20m19.9s idle. These are observations, not a wake-time guarantee.
 - A 512 MB/0.1 CPU free instance requires streaming, a small connection pool, conservative chunks, and a bounded heap.
 - Neon Free storage and egress make short retention essential.
 - Public imports are limited to 25,000 rows; the 100,000-record scenario is local only.

@@ -53,20 +53,24 @@ That script verifies readiness, OpenAPI, `/docs`, committed contract drift, exac
 
 The following observations were recorded on 2026-08-09 against the live Render API and Neon database:
 
-| Check                           | Observation                                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------------------------- |
-| First deployment readiness      | 207 s; this is deployment startup, not an idle-service cold wake                                   |
-| Maximum public import           | 25,000/25,000 synthetic internal-ledger rows imported, 0 quarantined, in 260 s                     |
-| Rolling replacement             | New Spring process started in 210.494 s; the existing public service remained available            |
-| Mixed exceptions                | 1,244 total results: 1,007 matched and 237 exceptions in 19.9 s                                    |
-| Month-end close                 | 11,539 total results: 11,239 matched and 300 exceptions from 10,000 canonical payments             |
-| Controlled failure and recovery | 11,369 total results: 10,813 matched and 556 exceptions in 264.65 s from 10,000 canonical payments |
+| Check                           | Observation                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| First deployment readiness      | 207 s; this is deployment startup, not an idle-service cold wake                                       |
+| Maximum public import           | 25,000/25,000 synthetic internal-ledger rows imported, 0 quarantined, in 260 s                         |
+| Rolling replacement             | New Spring process started in 210.494 s; the existing public service remained available                |
+| Genuine idle wake               | After 20m19.9s idle, the browser reached a real workspace by +266.512 s (4m26.5s observed upper bound) |
+| Mixed-exceptions API smoke      | 1,244 total results: 1,007 matched and 237 exceptions in 19.9 s                                        |
+| Final mobile audit run          | 1,244 total results: 1,007 matched and 237 exceptions in 42.4 s                                        |
+| Month-end close                 | 11,539 total results: 11,239 matched and 300 exceptions from 10,000 canonical payments                 |
+| Controlled failure and recovery | 11,369 total results: 10,813 matched and 556 exceptions in 264.65 s from 10,000 canonical payments     |
 
 Totals combine order-level and settlement-level results, so they can exceed the canonical-payment count.
 
 After the rolling replacement, the same live workspace still contained 1,244 results and its resolve/reopen audit entries. This is evidence that the workflow data persisted in Neon across that replacement. No public downtime was observed because the previous service stayed available during rollout, but one event is not an availability guarantee.
 
-Do not infer requests per second, steady-state capacity, availability, or production-scale performance from these demonstration runs. A genuine idle-to-ready cold start remains a separate evidence item until its check is recorded.
+For the genuine idle-wake check, the UI exposed its `role="status"` wake message and disabled both start actions by +5.3 seconds. Render began the container at +5.057 seconds, logged Spring starting at +25.802 seconds, started Tomcat at +226.099 seconds, and reported the application started in 211.098 seconds at +226.501 seconds from the click. The DispatcherServlet initialized at +232.499 seconds. The UI still showed the wake state at +243.085 seconds and was on `/scenarios` with a real workspace by +266.512 seconds. The 266.5-second figure is therefore an observed end-to-end upper bound, not an exact response time.
+
+Do not infer requests per second, steady-state capacity, availability, future cold-start time, or production-scale performance from these demonstration runs.
 
 ## Free-tier constraints
 

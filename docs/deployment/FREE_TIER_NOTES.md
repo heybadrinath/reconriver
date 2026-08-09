@@ -14,7 +14,9 @@ Render currently documents 750 free instance hours per workspace each month, sca
 
 The Free filesystem is ephemeral and there is no separate worker, so the deployment keeps durable state in Neon, stages uploads into PostgreSQL, runs batch jobs inside the web process, uses a three-connection Hikari pool with zero minimum idle connections, and sets a 320 MB maximum Java heap. The initial deployment reached readiness in 207 seconds. A separate rolling replacement started Spring in 210.494 seconds, retained the same Neon-backed workspace data, and produced no observed public downtime while the old service remained available. Neither startup is an idle-service cold-start measurement.
 
-The maximum public import path was exercised with a 25,000-row synthetic internal-ledger CSV: 25,000 rows imported, zero were quarantined, and the import completed in 260 seconds. A genuine cold start still requires dedicated production evidence before it is described as observed runtime behavior.
+The maximum public import path was exercised with a 25,000-row synthetic internal-ledger CSV: 25,000 rows imported, zero were quarantined, and the import completed in 260 seconds.
+
+A separate cold-start check began after 20m19.9s without public API activity. The UI showed its accessible wake message and disabled start actions by +5.3 seconds. Render reported the Spring application started in 211.098 seconds (+226.501 seconds from the first user action), while the browser reached `/scenarios` with a real workspace by +266.512 seconds. Record this as an observed end-to-end upper bound of 266.5 seconds (4m26.5s), not an exact response time or guarantee for future wakes.
 
 ## Neon Free
 
