@@ -1,0 +1,10 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,modulith
+
+logging:
+  level:
+    io.github.heybadrinath.reconriver: ${LOG_LEVEL:INFO}
+    org.springframework.batch: INFO

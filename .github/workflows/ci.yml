@@ -1,0 +1,221 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Java and executable JAR verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: reconriver
+          POSTGRES_USER: reconriver
+          POSTGRES_PASSWORD: reconriver_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U reconriver -d reconriver"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Compile, test, verify modules
+        working-directory: backend
+        run: ./mvnw -B -ntp verify
+      - name: Start and verify the executable JAR
+        env:
+          PORT: "18080"
+          DB_URL: jdbc:postgresql://127.0.0.1:5432/reconriver
+          DB_USERNAME: reconriver
+          DB_PASSWORD: reconriver_ci_only
+          DB_POOL_SIZE: "3"
+          ALLOWED_ORIGINS: https://reconriver.vercel.app
+          BATCH_CHUNK_SIZE: "500"
+          STARTUP_TIMEOUT_SECONDS: "180"
+          SMOKE_TIMEOUT_SECONDS: "300"
+          CURL_CONNECT_TIMEOUT_SECONDS: "5"
+          CURL_MAX_TIME_SECONDS: "30"
+        run: |
+          set -euo pipefail
+          api_log="${RUNNER_TEMP}/reconriver-api.log"
+          java -Xms128m -Xmx320m -XX:+ExitOnOutOfMemoryError \
+            -jar backend/reconciliation-api/target/reconriver-api.jar \
+            >"$api_log" 2>&1 &
+          api_pid=$!
+
+          cleanup() {
+            exit_code=$?
+            trap - EXIT
+            if (( exit_code != 0 )); then
+              tail -n 300 "$api_log" >&2 || true
+            fi
+            kill "$api_pid" >/dev/null 2>&1 || true
+            wait "$api_pid" >/dev/null 2>&1 || true
+            exit "$exit_code"
+          }
+          trap cleanup EXIT
+
+          ./scripts/verify-api-runtime.sh \
+            http://127.0.0.1:18080 \
+            https://reconriver.vercel.app
+          ./load-tests/smoke-api.sh \
+            http://127.0.0.1:18080 \
+            mixed-exceptions
+
+  frontend:
+    name: Next.js verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        working-directory: frontend
+        run: pnpm format:check
+      - name: Lint
+        working-directory: frontend
+        run: pnpm lint
+      - name: Type check
+        working-directory: frontend
+        run: pnpm typecheck
+      - name: Verify OpenAPI-to-TypeScript contract
+        working-directory: frontend
+        run: pnpm api:check
+      - name: Unit and accessibility tests
+        working-directory: frontend
+        run: pnpm test
+      - name: Production build
+        working-directory: frontend
+        run: pnpm build
+
+  container:
+    name: Root-context API container verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: reconriver
+          POSTGRES_USER: reconriver
+          POSTGRES_PASSWORD: reconriver_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U reconriver -d reconriver"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build Java 21 image
+        run: docker build --file backend/reconciliation-api/Dockerfile --tag reconriver-api:ci .
+      - name: Start and verify the non-root image
+        env:
+          STARTUP_TIMEOUT_SECONDS: "180"
+          SMOKE_TIMEOUT_SECONDS: "300"
+          CURL_CONNECT_TIMEOUT_SECONDS: "5"
+          CURL_MAX_TIME_SECONDS: "30"
+        run: |
+          set -euo pipefail
+          container_id=$(docker run --detach \
+            --add-host host.docker.internal:host-gateway \
+            --publish 18081:18081 \
+            --env PORT=18081 \
+            --env DB_URL=jdbc:postgresql://host.docker.internal:5432/reconriver \
+            --env DB_USERNAME=reconriver \
+            --env DB_PASSWORD=reconriver_ci_only \
+            --env DB_POOL_SIZE=3 \
+            --env ALLOWED_ORIGINS=https://reconriver.vercel.app \
+            --env BATCH_CHUNK_SIZE=500 \
+            --env 'JAVA_TOOL_OPTIONS=-Xms128m -Xmx320m -XX:+ExitOnOutOfMemoryError' \
+            reconriver-api:ci)
+
+          cleanup() {
+            exit_code=$?
+            trap - EXIT
+            if (( exit_code != 0 )); then
+              docker logs "$container_id" >&2 || true
+            fi
+            docker rm --force "$container_id" >/dev/null 2>&1 || true
+            exit "$exit_code"
+          }
+          trap cleanup EXIT
+
+          ./scripts/verify-api-runtime.sh \
+            http://127.0.0.1:18081 \
+            https://reconriver.vercel.app
+          test "$(docker exec "$container_id" id -u)" = "10001"
+          ./load-tests/smoke-api.sh \
+            http://127.0.0.1:18081 \
+            mixed-exceptions
+
+  datasets:
+    name: Dataset reproducibility and schema verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install JSON Schema validator
+        run: python -m pip install --disable-pip-version-check check-jsonschema==0.38.0
+      - name: Regenerate and byte-compare all scenario packs
+        run: ./scripts/verify-datasets.sh
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5

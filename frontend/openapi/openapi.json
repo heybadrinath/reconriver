@@ -1,0 +1,1855 @@
+{
+  "components": {
+    "schemas": {
+      "AuditEventView": {
+        "properties": {
+          "actorType": {
+            "type": "string"
+          },
+          "aggregateId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "aggregateType": {
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {},
+            "type": "object"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BankNode": {
+        "properties": {
+          "bankEntryId": {
+            "type": "string"
+          },
+          "bankReference": {
+            "type": "string"
+          },
+          "bookedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "creditedAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "settlementBatchId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CreateRunRequest": {
+        "properties": {
+          "controlledFailureAfterChunks": {
+            "format": "int32",
+            "maximum": 100000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ExceptionDetailView": {
+        "properties": {
+          "auditEvents": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventView"
+            },
+            "type": "array"
+          },
+          "resolutions": {
+            "items": {
+              "$ref": "#/components/schemas/ResolutionView"
+            },
+            "type": "array"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultView"
+          }
+        },
+        "type": "object"
+      },
+      "FileView": {
+        "properties": {
+          "checksum": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "downloadUrl": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "rowCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "sourceType": {
+            "enum": [
+              "INTERNAL",
+              "PROCESSOR",
+              "BANK"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "ImportRowErrorView": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "rowNumber": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ImportView": {
+        "properties": {
+          "checksum": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "duplicateOfId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "failureMessage": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "importedRows": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "quarantinedRows": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "sourceType": {
+            "enum": [
+              "INTERNAL",
+              "PROCESSOR",
+              "BANK"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "totalRows": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "InternalNode": {
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "internalPaymentId": {
+            "type": "string"
+          },
+          "merchantOrderId": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "paymentStatus": {
+            "type": "string"
+          },
+          "syntheticCustomerReference": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioView"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "LoadResponse": {
+        "properties": {
+          "controlledFailureAfterChunks": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "imports": {
+            "items": {
+              "$ref": "#/components/schemas/ImportView"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "scenarioSlug": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NoteRequest": {
+        "properties": {
+          "note": {
+            "maxLength": 1000,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "type": "object"
+      },
+      "PageResponseAuditEventView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventView"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageResponseImportRowErrorView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportRowErrorView"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageResponseImportView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportView"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageResponseResultView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ResultView"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageResponseRunView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunView"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "size": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalElements": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ProcessorNode": {
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "feeAmount": {
+            "type": "number"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "merchantOrderId": {
+            "type": "string"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "processorEventTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "processorEventType": {
+            "type": "string"
+          },
+          "processorStatus": {
+            "type": "string"
+          },
+          "processorTransactionId": {
+            "type": "string"
+          },
+          "settlementBatchId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProgressView": {
+        "properties": {
+          "failureMessage": {
+            "type": "string"
+          },
+          "percent": {
+            "format": "double",
+            "type": "number"
+          },
+          "processed": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "readCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "restartable": {
+            "type": "boolean"
+          },
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "skipCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "writeCount": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ResolutionView": {
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ResultView": {
+        "properties": {
+          "bankBookedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "bankCredit": {
+            "type": "number"
+          },
+          "bankEntryReference": {
+            "type": "string"
+          },
+          "bankSettlementId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "difference": {
+            "type": "number"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "internalOccurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "internalPaymentReference": {
+            "type": "string"
+          },
+          "internalTransactionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "outcome": {
+            "enum": [
+              "MATCHED",
+              "MISSING_INTERNAL",
+              "MISSING_PROCESSOR",
+              "MISSING_BANK_SETTLEMENT",
+              "DUPLICATE_INTERNAL",
+              "DUPLICATE_PROCESSOR",
+              "DUPLICATE_BANK_ENTRY",
+              "AMOUNT_MISMATCH",
+              "FEE_MISMATCH",
+              "CURRENCY_MISMATCH",
+              "LATE_SETTLEMENT",
+              "REFUND_MATCHED",
+              "PARTIAL_REFUND",
+              "AMBIGUOUS_MATCH",
+              "INVALID_SOURCE_ROW",
+              "MANUALLY_RESOLVED"
+            ],
+            "type": "string"
+          },
+          "processorEventAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "processorFee": {
+            "type": "number"
+          },
+          "processorTransactionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "processorTransactionReference": {
+            "type": "string"
+          },
+          "resolutionStatus": {
+            "type": "string"
+          },
+          "resultScope": {
+            "enum": [
+              "ORDER",
+              "SETTLEMENT"
+            ],
+            "type": "string"
+          },
+          "ruleCode": {
+            "type": "string"
+          },
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "settlementBatchId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "settlementBatchReference": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "workKey": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RunView": {
+        "properties": {
+          "completedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "durationMillis": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "exceptionCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "failureMessage": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "matchedCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "processedItems": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "progressPercent": {
+            "format": "double",
+            "type": "number"
+          },
+          "restartable": {
+            "type": "boolean"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "totalWorkItems": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ScenarioView": {
+        "properties": {
+          "availableFiles": {
+            "items": {
+              "$ref": "#/components/schemas/FileView"
+            },
+            "type": "array"
+          },
+          "canonicalPaymentCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "controlledFailureAfterChunks": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expectedExceptionCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "expectedReconciliationSummary": {
+            "additionalProperties": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "warning": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SessionCreated": {
+        "properties": {
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "warning": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SettlementNode": {
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "expectedCredit": {
+            "type": "number"
+          },
+          "firstEventAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "lastEventAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "settlementBatchId": {
+            "type": "string"
+          },
+          "transactionCount": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "SummaryView": {
+        "properties": {
+          "durationMillis": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "exceptionCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "matchedCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "matchedRate": {
+            "format": "double",
+            "type": "number"
+          },
+          "openExceptions": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "outcomes": {
+            "additionalProperties": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "rules": {
+            "additionalProperties": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "settlementBatchCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "totalResults": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "unreconciledValue": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "TransactionTraceView": {
+        "properties": {
+          "auditEvents": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventView"
+            },
+            "type": "array"
+          },
+          "bank": {
+            "$ref": "#/components/schemas/BankNode"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/ResultView"
+            },
+            "type": "array"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/InternalNode"
+          },
+          "processor": {
+            "$ref": "#/components/schemas/ProcessorNode"
+          },
+          "refund": {
+            "$ref": "#/components/schemas/ProcessorNode"
+          },
+          "settlementBatch": {
+            "$ref": "#/components/schemas/SettlementNode"
+          },
+          "transactionId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "opaque demo session token",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Explainable payment reconciliation and settlement workbench API.",
+    "license": {
+      "name": "MIT"
+    },
+    "title": "ReconRiver API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/audit-events": {
+      "get": {
+        "operationId": "list_4",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "eventType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "aggregateType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseAuditEventView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "audit-controller"
+        ]
+      }
+    },
+    "/api/v1/demo/scenarios": {
+      "get": {
+        "operationId": "list_3",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "summary": "List deterministic synthetic scenarios",
+        "tags": [
+          "Demonstration scenarios"
+        ]
+      }
+    },
+    "/api/v1/demo/scenarios/{slug}": {
+      "get": {
+        "operationId": "get_3",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Demonstration scenarios"
+        ]
+      }
+    },
+    "/api/v1/demo/scenarios/{slug}/files/{fileName}": {
+      "get": {
+        "operationId": "download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "fileName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "byte",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Demonstration scenarios"
+        ]
+      }
+    },
+    "/api/v1/demo/scenarios/{slug}/load": {
+      "post": {
+        "operationId": "load",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoadResponse"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "summary": "Load a scenario through the same import pipeline used by uploads",
+        "tags": [
+          "Demonstration scenarios"
+        ]
+      }
+    },
+    "/api/v1/demo/sessions": {
+      "post": {
+        "operationId": "create_1",
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCreated"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [],
+        "summary": "Start an isolated 24-hour demonstration workspace",
+        "tags": [
+          "Demo sessions"
+        ]
+      }
+    },
+    "/api/v1/exceptions": {
+      "get": {
+        "operationId": "list_2",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "runId",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseResultView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Exception workbench"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{exceptionId}": {
+      "get": {
+        "operationId": "get_2",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exceptionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDetailView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Exception workbench"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{exceptionId}/reopen": {
+      "post": {
+        "operationId": "reopen",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exceptionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Exception workbench"
+        ]
+      }
+    },
+    "/api/v1/exceptions/{exceptionId}/resolve": {
+      "post": {
+        "operationId": "resolve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exceptionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Exception workbench"
+        ]
+      }
+    },
+    "/api/v1/imports": {
+      "get": {
+        "operationId": "list_1",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sourceType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseImportView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Imports"
+        ]
+      },
+      "post": {
+        "description": "Use synthetic demonstration data only. Do not upload real payment, customer, card or bank information.",
+        "operationId": "upload",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sourceType",
+            "required": true,
+            "schema": {
+              "enum": [
+                "INTERNAL",
+                "PROCESSOR",
+                "BANK"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "description": "CSV only; maximum 10 MB and 25,000 data rows",
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportView"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "summary": "Validate, stage and start a restartable CSV import",
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{importId}": {
+      "get": {
+        "operationId": "get_1",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "importId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{importId}/errors": {
+      "get": {
+        "operationId": "errors",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "importId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseImportRowErrorView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Imports"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs": {
+      "get": {
+        "operationId": "list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseRunView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Reconciliation runs"
+        ]
+      },
+      "post": {
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRunRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunView"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "summary": "Start a protected, restartable reconciliation batch job",
+        "tags": [
+          "Reconciliation runs"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}": {
+      "get": {
+        "operationId": "get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Reconciliation runs"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}/progress": {
+      "get": {
+        "operationId": "progress",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Reconciliation runs"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}/report.csv": {
+      "get": {
+        "operationId": "report",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "format": "byte",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Download a spreadsheet-safe CSV report",
+        "tags": [
+          "results-controller"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}/restart": {
+      "post": {
+        "operationId": "restart",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunView"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "tags": [
+          "Reconciliation runs"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}/results": {
+      "get": {
+        "operationId": "results",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ruleCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resolutionStatus",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseResultView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "results-controller"
+        ]
+      }
+    },
+    "/api/v1/reconciliation-runs/{runId}/summary": {
+      "get": {
+        "operationId": "summary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "results-controller"
+        ]
+      }
+    },
+    "/api/v1/transactions/{transactionId}/trace": {
+      "get": {
+        "operationId": "trace",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "transactionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionTraceView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Transaction trace"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
+}

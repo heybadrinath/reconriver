@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: reconriver-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/reconriver}
+    username: ${DB_USERNAME:reconriver}
+    password: ${DB_PASSWORD:reconriver_local_only}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:4}
+      minimum-idle: 0
+      connection-timeout: 30000
+  flyway:
+    enabled: true
+    validate-migration-naming: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+  servlet:
+    multipart:
+      max-file-size: ${MAX_UPLOAD_BYTES:10485760}
+      max-request-size: ${MAX_UPLOAD_BYTES:10485760}
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ReconRiver API
+    description: Explainable payment reconciliation and settlement workbench
+    java: 21
+    spring-boot: 4.1.0
+
+reconriver:
+  security:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+    token-hash-secret: ${DEMO_TOKEN_HASH_SECRET:local-development-secret-change-me-now}
+    session-ttl-hours: ${DEMO_SESSION_TTL_HOURS:24}
+    requests-per-minute: ${REQUESTS_PER_MINUTE:120}
+    session-creations-per-minute: ${SESSION_CREATIONS_PER_MINUTE:10}
+    uploads-per-hour: ${UPLOADS_PER_HOUR:12}
+    scenario-loads-per-hour: ${SCENARIO_LOADS_PER_HOUR:4}
+  imports:
+    max-upload-bytes: ${MAX_UPLOAD_BYTES:10485760}
+    max-rows: ${MAX_IMPORT_ROWS:25000}
+    max-columns: ${MAX_IMPORT_COLUMNS:20}
+    max-row-characters: ${MAX_IMPORT_ROW_CHARACTERS:16384}
+  batch:
+    chunk-size: ${BATCH_CHUNK_SIZE:500}
+  reconciliation:
+    fee-percent: ${PROCESSOR_FEE_PERCENT:2.90}
+    fee-fixed: ${PROCESSOR_FEE_FIXED:0.30}
+    settlement-window-days: ${SETTLEMENT_WINDOW_DAYS:3}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+    operations-sorter: method
+    tags-sorter: alpha

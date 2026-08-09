@@ -1,0 +1,14 @@
+.git/
+.github/
+.idea/
+.vscode/
+.env
+.env.*
+.neon
+.vercel/
+backend/**/target/
+datasets/generated/local-performance/
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+load-tests/results/

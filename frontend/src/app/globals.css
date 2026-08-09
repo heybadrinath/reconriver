@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+:root {
+  --environment: #e7e8ea;
+  --canvas: #f4f8f7;
+  --surface: #fcfdfc;
+  --surface-muted: #edf2f0;
+  --ink: #101112;
+  --muted: #606765;
+  --muted-strong: #4e5654;
+  --border: #dce3e1;
+  --border-strong: #c9d1cf;
+  --coral: #ff6a50;
+  --coral-strong: #c53a27;
+  --coral-soft: #fff0eb;
+  --yellow: #f6c945;
+  --yellow-soft: #fff6cf;
+  --green: #48c78e;
+  --green-soft: #ddf6ea;
+  --violet: #8c63e7;
+  --violet-soft: #eee8ff;
+  --critical: #d83b32;
+  --focus: #9d7410;
+  --radius-card: 1.55rem;
+  --shadow-card:
+    0 1px 0 rgb(16 17 18 / 0.04), 0 10px 26px rgb(16 17 18 / 0.035);
+  --shadow-shell: 0 28px 70px rgb(16 17 18 / 0.13);
+}
+
+@theme inline {
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-barlow-condensed);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--environment);
+  color: var(--ink);
+  font-family: var(--font-manrope), sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--environment);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-barlow-condensed), sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-ibm-plex-mono), monospace;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-180%);
+  border-radius: 999px;
+  background: var(--ink);
+  padding: 0.75rem 1rem;
+  color: white;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.utility-label {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.metric-number {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-size: clamp(2.35rem, 4vw, 4.4rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.035em;
+}
+
+.technical-value {
+  overflow-wrap: anywhere;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --radius-card: 1.25rem;
+  }
+
+  .data-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

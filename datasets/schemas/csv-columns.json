@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReconRiver generated CSV column contract",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "internal_transactions.csv": {
+      "const": [
+        "internal_payment_id",
+        "merchant_order_id",
+        "occurred_at",
+        "gross_amount",
+        "currency",
+        "payment_status",
+        "payment_method",
+        "synthetic_customer_reference"
+      ]
+    },
+    "processor_transactions.csv": {
+      "const": [
+        "processor_transaction_id",
+        "merchant_order_id",
+        "processor_event_type",
+        "processor_event_time",
+        "gross_amount",
+        "fee_amount",
+        "net_amount",
+        "currency",
+        "settlement_batch_id",
+        "processor_status"
+      ]
+    },
+    "bank_settlements.csv": {
+      "const": [
+        "bank_entry_id",
+        "settlement_batch_id",
+        "booked_at",
+        "credited_amount",
+        "currency",
+        "bank_reference",
+        "description"
+      ]
+    },
+    "expected_reconciliation.csv": {
+      "const": [
+        "scenario_id",
+        "result_scope",
+        "work_key",
+        "settlement_batch_id",
+        "internal_payment_id",
+        "processor_transaction_id",
+        "bank_entry_id",
+        "expected_outcome",
+        "expected_reason_code",
+        "expected_difference",
+        "explanation"
+      ]
+    }
+  },
+  "required": [
+    "internal_transactions.csv",
+    "processor_transactions.csv",
+    "bank_settlements.csv",
+    "expected_reconciliation.csv"
+  ]
+}

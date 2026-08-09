@@ -1,0 +1,46 @@
+{
+  "scenario_id" : "clean-settlement",
+  "scenario_name" : "Clean settlement",
+  "generator_version" : "1.1.0",
+  "random_seed" : 42,
+  "fixed_start_date" : "2026-01-01",
+  "generation_timestamp" : "2026-01-01T00:00:00Z",
+  "canonical_payment_count" : 100,
+  "file_row_counts" : {
+    "bank_settlements.csv" : 7,
+    "expected_reconciliation.csv" : 107,
+    "internal_transactions.csv" : 100,
+    "processor_transactions.csv" : 100
+  },
+  "injected_exception_counts" : { },
+  "assumed_exception_rates" : { },
+  "fee_policy" : {
+    "percentage_rate" : "2.90%",
+    "fixed_charge" : "0.30",
+    "rounding_mode" : "HALF_UP",
+    "net_amount_formula" : "gross_amount - fee_amount"
+  },
+  "settlement_window" : "3 calendar days after the latest processor event in a batch",
+  "currencies" : [ "USD" ],
+  "file_sha256_checksums" : {
+    "README.md" : "87230650d87a3a4d209d9540c842e867869f6fd281a8ae8a2faaf251f4d7db08",
+    "bank_settlements.csv" : "fd696c30cae4deed55b1610a1d0eb3e35fa2a70b8ada65eefadd38eda24cc19c",
+    "expected_reconciliation.csv" : "f66de6091706b4497f208f1909ce232f2280adc15200ed30033a19e4f501ff58",
+    "internal_transactions.csv" : "de7ad57c1d4b22997ee3bcf119356e39d6aeb652c97e2436589550714b1aaa38",
+    "processor_transactions.csv" : "cbf296dedcb4f8b4f4b779f33d068e9e7652890316354269ff909b4b572bd81f"
+  },
+  "checksum_scope" : "Checksums cover every loose scenario file except this manifest and the ZIP archive, which would otherwise require recursive checksums.",
+  "expected_reconciliation_summary" : {
+    "MATCHED" : 107
+  },
+  "expected_reconciliation_summary_by_scope" : {
+    "ORDER" : {
+      "MATCHED" : 100
+    },
+    "SETTLEMENT" : {
+      "MATCHED" : 7
+    }
+  },
+  "synthetic_data_disclaimer" : "This dataset is entirely synthetic. It contains no genuine people, payments, cards, bank accounts, addresses, or customer identifiers.",
+  "exception_percentages_assumption" : "All exception percentages and distributions are documented demonstration assumptions; they are not measurements of real payment behavior."
+}

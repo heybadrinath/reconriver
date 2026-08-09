@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: reconriver-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerContext: .
+    dockerfilePath: ./backend/reconciliation-api/Dockerfile
+    healthCheckPath: /actuator/health/readiness
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://reconriver.vercel.app
+      - key: DEMO_TOKEN_HASH_SECRET
+        generateValue: true
+      - key: DEMO_SESSION_TTL_HOURS
+        value: "24"
+      - key: MAX_UPLOAD_BYTES
+        value: "10485760"
+      - key: MAX_IMPORT_ROWS
+        value: "25000"
+      - key: BATCH_CHUNK_SIZE
+        value: "500"
+      - key: DB_POOL_SIZE
+        value: "3"
+      - key: MAX_IMPORT_COLUMNS
+        value: "20"
+      - key: MAX_IMPORT_ROW_CHARACTERS
+        value: "16384"
+      - key: REQUESTS_PER_MINUTE
+        value: "120"
+      - key: SESSION_CREATIONS_PER_MINUTE
+        value: "10"
+      - key: UPLOADS_PER_HOUR
+        value: "12"
+      - key: SCENARIO_LOADS_PER_HOUR
+        value: "4"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx320m -XX:+ExitOnOutOfMemoryError

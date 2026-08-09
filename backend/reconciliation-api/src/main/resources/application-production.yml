@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:3}
+      minimum-idle: 0
+      connection-timeout: 30000
+      data-source-properties:
+        sslmode: require
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+reconriver:
+  security:
+    token-hash-secret: ${DEMO_TOKEN_HASH_SECRET}
+    allowed-origins: ${ALLOWED_ORIGINS:https://reconriver.vercel.app}
+
+logging:
+  level:
+    root: INFO
+    io.github.heybadrinath.reconriver: INFO
+    org.hibernate.SQL: OFF
+    org.springframework.batch: INFO
+    org.springframework.security: WARN

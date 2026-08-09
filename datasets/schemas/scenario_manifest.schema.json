@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/heybadrinath/reconriver/datasets/schemas/scenario_manifest.schema.json",
+  "title": "ReconRiver scenario manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_id",
+    "scenario_name",
+    "generator_version",
+    "random_seed",
+    "fixed_start_date",
+    "generation_timestamp",
+    "canonical_payment_count",
+    "file_row_counts",
+    "injected_exception_counts",
+    "assumed_exception_rates",
+    "fee_policy",
+    "settlement_window",
+    "currencies",
+    "file_sha256_checksums",
+    "checksum_scope",
+    "expected_reconciliation_summary",
+    "expected_reconciliation_summary_by_scope",
+    "synthetic_data_disclaimer",
+    "exception_percentages_assumption"
+  ],
+  "properties": {
+    "scenario_id": { "type": "string", "pattern": "^[a-z]+(?:-[a-z]+)*$" },
+    "scenario_name": { "type": "string", "minLength": 1 },
+    "generator_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "random_seed": { "type": "integer" },
+    "fixed_start_date": { "type": "string", "format": "date" },
+    "generation_timestamp": { "type": "string", "format": "date-time" },
+    "canonical_payment_count": { "type": "integer", "minimum": 1 },
+    "file_row_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "injected_exception_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "assumed_exception_rates": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9]+\\.[0-9]{2}%$" }
+    },
+    "fee_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["percentage_rate", "fixed_charge", "rounding_mode", "net_amount_formula"],
+      "properties": {
+        "percentage_rate": { "type": "string" },
+        "fixed_charge": { "type": "string", "pattern": "^-?[0-9]+\\.[0-9]{2}$" },
+        "rounding_mode": { "const": "HALF_UP" },
+        "net_amount_formula": { "const": "gross_amount - fee_amount" }
+      }
+    },
+    "settlement_window": { "type": "string", "minLength": 1 },
+    "currencies": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Z]{3}$" }
+    },
+    "file_sha256_checksums": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+    },
+    "checksum_scope": { "type": "string", "minLength": 1 },
+    "expected_reconciliation_summary": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "expected_reconciliation_summary_by_scope": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "synthetic_data_disclaimer": { "type": "string", "minLength": 1 },
+    "exception_percentages_assumption": { "type": "string", "minLength": 1 },
+    "failure_recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["controlled_failure_after_rows", "restart_chunk_size", "controlled_failure_after_chunks", "restart_expectation"],
+      "properties": {
+        "controlled_failure_after_rows": { "type": "integer", "minimum": 1 },
+        "restart_chunk_size": { "type": "integer", "minimum": 1 },
+        "controlled_failure_after_chunks": { "type": "integer", "minimum": 1 },
+        "restart_expectation": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

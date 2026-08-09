@@ -1,0 +1,94 @@
+{
+  "scenario_id" : "month-end-close",
+  "scenario_name" : "Month-end close",
+  "generator_version" : "1.1.0",
+  "random_seed" : 42,
+  "fixed_start_date" : "2026-01-01",
+  "generation_timestamp" : "2026-01-01T00:00:00Z",
+  "canonical_payment_count" : 10000,
+  "file_row_counts" : {
+    "bank_settlements.csv" : 1499,
+    "expected_reconciliation.csv" : 11539,
+    "internal_transactions.csv" : 10000,
+    "processor_transactions.csv" : 10200
+  },
+  "injected_exception_counts" : {
+    "ambiguous_matches" : 10,
+    "amount_mismatches" : 30,
+    "bank_amount_mismatches" : 10,
+    "bank_currency_mismatches" : 10,
+    "currency_mismatches" : 10,
+    "fee_mismatches" : 20,
+    "full_refunds" : 100,
+    "late_settlements" : 40,
+    "missing_bank_settlements" : 20,
+    "missing_processor_records" : 30,
+    "partial_refunds" : 100,
+    "processor_only_records" : 20
+  },
+  "assumed_exception_rates" : {
+    "ambiguous_matches" : "0.10%",
+    "amount_mismatches" : "0.30%",
+    "bank_amount_mismatches" : "0.10%",
+    "bank_currency_mismatches" : "0.10%",
+    "currency_mismatches" : "0.10%",
+    "fee_mismatches" : "0.20%",
+    "full_refunds" : "1.00%",
+    "late_settlements" : "0.40%",
+    "missing_bank_settlements" : "0.20%",
+    "missing_processor_records" : "0.30%",
+    "partial_refunds" : "1.00%",
+    "processor_only_records" : "0.20%"
+  },
+  "fee_policy" : {
+    "percentage_rate" : "2.90%",
+    "fixed_charge" : "0.30",
+    "rounding_mode" : "HALF_UP",
+    "net_amount_formula" : "gross_amount - fee_amount"
+  },
+  "settlement_window" : "3 calendar days after the latest processor event in a batch",
+  "currencies" : [ "EUR", "GBP", "USD" ],
+  "file_sha256_checksums" : {
+    "README.md" : "a0df4fdce4a91ca0880fb466a601ba302c1a5fb059ef74ad1ab3f56100d47dca",
+    "bank_settlements.csv" : "950e0cb5715bc3c5f6b9cb190e4f38a61aab2dcbe691d57979183f9678f72fc0",
+    "expected_reconciliation.csv" : "228cc7395be543867fe3106e3c16205d14882c4e059232de9cc181c80050cc2d",
+    "internal_transactions.csv" : "0909917ebb0a8a365561e16b554d97801d306e8d42d9a4ae1b3bbeab26b33805",
+    "processor_transactions.csv" : "68b2ccfc3264debeafb0cbcc9ca42da4c9e297fd85c3e755e3b08eaf3a9b5d5d"
+  },
+  "checksum_scope" : "Checksums cover every loose scenario file except this manifest and the ZIP archive, which would otherwise require recursive checksums.",
+  "expected_reconciliation_summary" : {
+    "AMBIGUOUS_MATCH" : 10,
+    "AMOUNT_MISMATCH" : 40,
+    "CURRENCY_MISMATCH" : 20,
+    "FEE_MISMATCH" : 20,
+    "LATE_SETTLEMENT" : 40,
+    "MATCHED" : 11139,
+    "MISSING_BANK_SETTLEMENT" : 20,
+    "MISSING_INTERNAL" : 20,
+    "MISSING_PROCESSOR" : 30,
+    "PARTIAL_REFUND" : 100,
+    "REFUND_MATCHED" : 100
+  },
+  "expected_reconciliation_summary_by_scope" : {
+    "ORDER" : {
+      "AMBIGUOUS_MATCH" : 10,
+      "AMOUNT_MISMATCH" : 30,
+      "CURRENCY_MISMATCH" : 10,
+      "FEE_MISMATCH" : 20,
+      "MATCHED" : 9700,
+      "MISSING_INTERNAL" : 20,
+      "MISSING_PROCESSOR" : 30,
+      "PARTIAL_REFUND" : 100,
+      "REFUND_MATCHED" : 100
+    },
+    "SETTLEMENT" : {
+      "AMOUNT_MISMATCH" : 10,
+      "CURRENCY_MISMATCH" : 10,
+      "LATE_SETTLEMENT" : 40,
+      "MATCHED" : 1439,
+      "MISSING_BANK_SETTLEMENT" : 20
+    }
+  },
+  "synthetic_data_disclaimer" : "This dataset is entirely synthetic. It contains no genuine people, payments, cards, bank accounts, addresses, or customer identifiers.",
+  "exception_percentages_assumption" : "All exception percentages and distributions are documented demonstration assumptions; they are not measurements of real payment behavior."
+}

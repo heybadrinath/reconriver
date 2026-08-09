@@ -1,0 +1,5 @@
+**/target/
+dataset-generator/src/
+.mvn/
+mvnw
+mvnw.cmd

@@ -1,0 +1,85 @@
+{
+  "scenario_id" : "failure-recovery",
+  "scenario_name" : "Failure recovery",
+  "generator_version" : "1.1.0",
+  "random_seed" : 42,
+  "fixed_start_date" : "2026-01-01",
+  "generation_timestamp" : "2026-01-01T00:00:00Z",
+  "canonical_payment_count" : 10000,
+  "file_row_counts" : {
+    "bank_settlements.csv" : 1319,
+    "expected_reconciliation.csv" : 11369,
+    "internal_transactions.csv" : 10100,
+    "processor_transactions.csv" : 10200
+  },
+  "injected_exception_counts" : {
+    "ambiguous_matches" : 50,
+    "bank_only_entries" : 10,
+    "duplicate_bank_entries" : 50,
+    "duplicate_internal_records" : 100,
+    "duplicate_processor_records" : 100,
+    "invalid_rows" : 50,
+    "missing_processor_records" : 50,
+    "quarantined_rows" : 50
+  },
+  "assumed_exception_rates" : {
+    "ambiguous_matches" : "0.50%",
+    "bank_only_entries" : "0.10%",
+    "duplicate_bank_entries" : "0.50%",
+    "duplicate_internal_records" : "1.00%",
+    "duplicate_processor_records" : "1.00%",
+    "invalid_rows" : "0.50%",
+    "missing_processor_records" : "0.50%",
+    "quarantined_rows" : "0.50%"
+  },
+  "fee_policy" : {
+    "percentage_rate" : "2.90%",
+    "fixed_charge" : "0.30",
+    "rounding_mode" : "HALF_UP",
+    "net_amount_formula" : "gross_amount - fee_amount"
+  },
+  "settlement_window" : "3 calendar days after the latest processor event in a batch",
+  "currencies" : [ "EUR", "GBP", "USD" ],
+  "file_sha256_checksums" : {
+    "README.md" : "446b836c525386b0c7fc93cb409acf5efa66ec54326381def167457730da72f8",
+    "bank_settlements.csv" : "6f358688a28534fb74cbd4a5a21b6ea21f94487a769e57d76f766eea8e159d20",
+    "expected_reconciliation.csv" : "65aba82be19954f8b707b0f43930a8e9af613963557baef75f0c88e276bb339d",
+    "internal_transactions.csv" : "8b409b250ec24ed02d0a8a1896c64be0d014f7c8605f520d813fe43c60e323f1",
+    "processor_transactions.csv" : "565a014bc60060a44d360acda9bbe284e5e5fd9c1e35d9a69cc65cfab1d0b40c"
+  },
+  "checksum_scope" : "Checksums cover every loose scenario file except this manifest and the ZIP archive, which would otherwise require recursive checksums.",
+  "expected_reconciliation_summary" : {
+    "AMBIGUOUS_MATCH" : 50,
+    "AMOUNT_MISMATCH" : 96,
+    "DUPLICATE_BANK_ENTRY" : 50,
+    "DUPLICATE_INTERNAL" : 100,
+    "DUPLICATE_PROCESSOR" : 100,
+    "INVALID_SOURCE_ROW" : 100,
+    "MATCHED" : 10813,
+    "MISSING_PROCESSOR" : 60
+  },
+  "expected_reconciliation_summary_by_scope" : {
+    "ORDER" : {
+      "AMBIGUOUS_MATCH" : 50,
+      "DUPLICATE_INTERNAL" : 100,
+      "DUPLICATE_PROCESSOR" : 100,
+      "INVALID_SOURCE_ROW" : 100,
+      "MATCHED" : 9700,
+      "MISSING_PROCESSOR" : 50
+    },
+    "SETTLEMENT" : {
+      "AMOUNT_MISMATCH" : 96,
+      "DUPLICATE_BANK_ENTRY" : 50,
+      "MATCHED" : 1113,
+      "MISSING_PROCESSOR" : 10
+    }
+  },
+  "synthetic_data_disclaimer" : "This dataset is entirely synthetic. It contains no genuine people, payments, cards, bank accounts, addresses, or customer identifiers.",
+  "exception_percentages_assumption" : "All exception percentages and distributions are documented demonstration assumptions; they are not measurements of real payment behavior.",
+  "failure_recovery" : {
+    "controlled_failure_after_rows" : 2500,
+    "restart_chunk_size" : 500,
+    "controlled_failure_after_chunks" : 5,
+    "restart_expectation" : "Restart from the last committed chunk without creating duplicate reconciliation results."
+  }
+}
