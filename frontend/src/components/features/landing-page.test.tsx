@@ -55,7 +55,7 @@ describe("LandingPage", () => {
     act(() => vi.advanceTimersByTime(3_500));
     expect(screen.getByText("The backend is waking up.")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent(
-      "This can take up to a minute",
+      "This can take several minutes",
     );
   });
 

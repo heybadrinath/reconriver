@@ -53,7 +53,7 @@ export function Select({
               <SelectPrimitive.Item
                 key={option.value}
                 value={option.value}
-                className="relative flex cursor-default items-center rounded-xl py-2.5 pr-8 pl-3 text-sm font-semibold outline-none select-none data-[highlighted]:bg-[var(--surface-muted)]"
+                className="relative flex min-h-11 cursor-default items-center rounded-xl py-2.5 pr-8 pl-3 text-sm font-semibold outline-none select-none data-[highlighted]:bg-[var(--surface-muted)]"
               >
                 <SelectPrimitive.ItemText>
                   {option.label}

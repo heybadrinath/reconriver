@@ -245,6 +245,7 @@ export function ReconciliationRiver({
 
           <div
             className="space-y-3 md:hidden"
+            role="group"
             aria-label="Reconciliation flows in mobile layout"
           >
             {visible.map((flow) => {
@@ -303,7 +304,7 @@ export function ReconciliationRiver({
       )}
 
       <details className="mt-4 rounded-2xl border border-[var(--border)] bg-white p-4">
-        <summary className="cursor-pointer font-bold focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:outline-none">
+        <summary className="min-h-11 cursor-pointer py-3 font-bold focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:outline-none">
           View equivalent flow table
         </summary>
         <div className="mt-4 overflow-x-auto">

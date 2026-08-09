@@ -74,6 +74,12 @@ describe("ReconciliationRiver", () => {
     const onSelect = vi.fn();
     render(<ReconciliationRiver results={results} onSelect={onSelect} />);
 
+    expect(
+      screen.getByRole("group", {
+        name: /Reconciliation flows in mobile layout/i,
+      }),
+    ).toBeInTheDocument();
+
     const flow = screen.getByRole("button", { name: /Matched, \$120\.00/i });
     flow.focus();
     await user.keyboard("{Enter}");

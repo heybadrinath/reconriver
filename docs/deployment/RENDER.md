@@ -1,6 +1,8 @@
 # Render deployment
 
-ReconRiver is configured to deploy its Spring Boot API as the `reconriver-api` [Render Free Web Service](https://render.com/docs/free) in Frankfurt. The repository's `render.yaml` is the source of truth for the intended Docker build, health check, free instance type, and non-secret runtime settings. Do not describe the service as live until the assigned Render URL passes the verification below.
+ReconRiver's Spring Boot API is live at [reconriver-api.onrender.com](https://reconriver-api.onrender.com/docs) as the `reconriver-api` [Render Free Web Service](https://render.com/docs/free) in Frankfurt.
+
+The service was created through Render's official API using values equivalent to the repository's `render.yaml`; it is not linked to a Render Blueprint. The checked-in file remains the reviewable source for the intended Docker build, health check, free instance type, and non-secret runtime settings. One deliberate live-service difference is that automatic deployment is disabled, so a tested commit must be promoted manually; `render.yaml` retains `checksPass` for a future Blueprint-created service.
 
 ## Configured runtime shape
 
@@ -16,7 +18,7 @@ ReconRiver is configured to deploy its Spring Boot API as the `reconriver-api` [
 
 ## Required secrets
 
-Render should prompt for the following values during the first Blueprint sync. They must remain in Render, never in Git:
+The following values are stored only in Render and must never enter Git, screenshots, logs, or documentation:
 
 | Variable      | Value shape                                                                               |
 | ------------- | ----------------------------------------------------------------------------------------- |
@@ -24,7 +26,7 @@ Render should prompt for the following values during the first Blueprint sync. T
 | `DB_USERNAME` | Neon database role                                                                        |
 | `DB_PASSWORD` | Neon role password                                                                        |
 
-`DEMO_TOKEN_HASH_SECRET` is configured for Render-generated storage. The Blueprint pins `ALLOWED_ORIGINS` to the intended exact `https://reconriver.vercel.app` origin and sets `DB_POOL_SIZE=3`; the application fixes Hikari's minimum idle count at zero. All other non-secret variables are declared in `render.yaml`. Verify the resolved environment values in Render without copying secret values into logs or documentation.
+`DEMO_TOKEN_HASH_SECRET` uses a generated production value stored in Render. The live service pins `ALLOWED_ORIGINS` to the exact `https://reconriver.vercel.app` origin and sets `DB_POOL_SIZE=3`; the application fixes Hikari's minimum idle count at zero. All other non-secret variables are mirrored in `render.yaml`. Verify environment keys and safe shapes without copying secret values into logs or documentation.
 
 The direct Neon endpoint is intentional. Flyway, Spring Batch metadata updates, and application transactions need normal PostgreSQL session behavior; [Neon's pooled endpoint](https://neon.com/docs/connect/connection-pooling) uses transaction-mode PgBouncer and is not the selected target. The application-side three-connection pool is already below the configured Free-instance concurrency. A production JDBC URL should have this shape:
 
@@ -36,18 +38,35 @@ Do not commit a concrete host, role, password, or generated token secret.
 
 ## Verification
 
-After deployment, verify both a warm and cold request:
+After each manual promotion, run the repository's runtime verifier before the product journey:
 
 ```bash
-API_BASE_URL="https://<assigned-render-host>"
-curl --fail --show-error "$API_BASE_URL/actuator/health/readiness"
-curl --fail --show-error "$API_BASE_URL/v3/api-docs" >/dev/null
-curl --fail --show-error -H 'Origin: https://reconriver.vercel.app' \
-  -D - -o /dev/null "$API_BASE_URL/actuator/health/readiness" \
-  | grep -Fi 'access-control-allow-origin: https://reconriver.vercel.app'
+STARTUP_TIMEOUT_SECONDS=360 \
+  ./scripts/verify-api-runtime.sh \
+  https://reconriver-api.onrender.com \
+  https://reconriver.vercel.app
 ```
 
-Repeat the CORS request with an unrelated origin and verify that no `Access-Control-Allow-Origin` header is returned. The full browser smoke test must then create a demo session, import a stored scenario, run the real Spring Batch reconciliation, resolve and reopen an exception, inspect the audit timeline, and download the report.
+That script verifies readiness, OpenAPI, `/docs`, committed contract drift, exact trusted CORS, rejected-origin HTTP 403, health/info-only Actuator exposure, and hidden metrics/Modulith endpoints. The full browser smoke test must then create a demo session, import a stored scenario, run the real Spring Batch reconciliation, resolve and reopen an exception, inspect the audit timeline, and download the report.
+
+## Recorded public-service evidence
+
+The following observations were recorded on 2026-08-09 against the live Render API and Neon database:
+
+| Check                           | Observation                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| First deployment readiness      | 207 s; this is deployment startup, not an idle-service cold wake                                   |
+| Maximum public import           | 25,000/25,000 synthetic internal-ledger rows imported, 0 quarantined, in 260 s                     |
+| Rolling replacement             | New Spring process started in 210.494 s; the existing public service remained available            |
+| Mixed exceptions                | 1,244 total results: 1,007 matched and 237 exceptions in 19.9 s                                    |
+| Month-end close                 | 11,539 total results: 11,239 matched and 300 exceptions from 10,000 canonical payments             |
+| Controlled failure and recovery | 11,369 total results: 10,813 matched and 556 exceptions in 264.65 s from 10,000 canonical payments |
+
+Totals combine order-level and settlement-level results, so they can exceed the canonical-payment count.
+
+After the rolling replacement, the same live workspace still contained 1,244 results and its resolve/reopen audit entries. This is evidence that the workflow data persisted in Neon across that replacement. No public downtime was observed because the previous service stayed available during rollout, but one event is not an availability guarantee.
+
+Do not infer requests per second, steady-state capacity, availability, or production-scale performance from these demonstration runs. A genuine idle-to-ready cold start remains a separate evidence item until its check is recorded.
 
 ## Free-tier constraints
 

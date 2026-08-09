@@ -56,7 +56,7 @@ const resultColumns: ColumnDef<ResultView>[] = [
     cell: ({ row }) => (
       <Link
         href={`/transactions/${row.original.internalTransactionId ?? row.original.processorTransactionId ?? row.original.id}`}
-        className="font-mono text-xs font-semibold underline-offset-4 hover:underline"
+        className="inline-flex min-h-11 items-center font-mono text-xs font-semibold underline-offset-4 hover:underline md:min-h-0"
       >
         {row.original.internalPaymentReference ??
           row.original.processorTransactionReference ??

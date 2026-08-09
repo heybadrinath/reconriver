@@ -45,16 +45,11 @@ export function ColdStartState() {
       className="flex items-start gap-3 rounded-2xl border border-[#d6bd63] bg-[var(--yellow-soft)] p-4"
       role="status"
     >
-      <Hourglass
-        className="mt-0.5 shrink-0"
-        size={20}
-
-        aria-hidden="true"
-      />
+      <Hourglass className="mt-0.5 shrink-0" size={20} aria-hidden="true" />
       <div>
         <p className="font-bold">The backend is waking up.</p>
         <p className="text-sm text-[var(--muted-strong)]">
-          This can take up to a minute on the free demo. Keep this page open.
+          This can take several minutes on the free demo. Keep this page open.
         </p>
       </div>
     </div>

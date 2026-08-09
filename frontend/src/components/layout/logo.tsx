@@ -14,7 +14,7 @@ export function Logo({
     <Link
       href="/"
       className={cn(
-        "inline-flex items-center gap-2 rounded-full focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:outline-none",
+        "inline-flex min-h-11 items-center gap-2 rounded-full focus-visible:ring-3 focus-visible:ring-[var(--focus)] focus-visible:outline-none",
         light ? "text-white" : "text-[var(--ink)]",
       )}
       aria-label="ReconRiver home"
