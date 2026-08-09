@@ -34,6 +34,29 @@ configs:
     data_files: "generated/month-end-close/bank_settlements.csv"
   - config_name: month_end_ground_truth
     data_files: "generated/month-end-close/expected_reconciliation.csv"
+    features:
+      - name: scenario_id
+        dtype: string
+      - name: result_scope
+        dtype: string
+      - name: work_key
+        dtype: string
+      - name: settlement_batch_id
+        dtype: string
+      - name: internal_payment_id
+        dtype: string
+      - name: processor_transaction_id
+        dtype: string
+      - name: bank_entry_id
+        dtype: string
+      - name: expected_outcome
+        dtype: string
+      - name: expected_reason_code
+        dtype: string
+      - name: expected_difference
+        dtype: float64
+      - name: explanation
+        dtype: string
   - config_name: failure_recovery_internal_ledger
     data_files: "generated/failure-recovery/internal_transactions.csv"
   - config_name: failure_recovery_processor
@@ -42,6 +65,29 @@ configs:
     data_files: "generated/failure-recovery/bank_settlements.csv"
   - config_name: failure_recovery_ground_truth
     data_files: "generated/failure-recovery/expected_reconciliation.csv"
+    features:
+      - name: scenario_id
+        dtype: string
+      - name: result_scope
+        dtype: string
+      - name: work_key
+        dtype: string
+      - name: settlement_batch_id
+        dtype: string
+      - name: internal_payment_id
+        dtype: string
+      - name: processor_transaction_id
+        dtype: string
+      - name: bank_entry_id
+        dtype: string
+      - name: expected_outcome
+        dtype: string
+      - name: expected_reason_code
+        dtype: string
+      - name: expected_difference
+        dtype: float64
+      - name: explanation
+        dtype: string
 ---
 
 # ReconRiver synthetic reconciliation dataset
