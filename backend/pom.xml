@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -34,8 +34,8 @@
 
     <properties>
         <java.version>21</java.version>
-        <spring-modulith.version>2.1.0</spring-modulith.version>
-        <springdoc.version>3.1.0</springdoc.version>
+        <spring-modulith.version>2.1.1</spring-modulith.version>
+        <springdoc.version>3.1.1</springdoc.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <picocli.version>4.7.7</picocli.version>
         <maven.compiler.release>21</maven.compiler.release>
@@ -94,7 +94,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.46.1</version>
+                <version>3.10.2</version>
                 <configuration>
                     <java>
                         <removeUnusedImports/>
